@@ -1,0 +1,15 @@
+services:
+  task-blaster-db:
+    image: postgres
+    container_name: task-blaster-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=TaskBlaster
+    networks:
+      - task-blaster-network
+networks:
+  task-blaster-network:
+    driver: bridge
