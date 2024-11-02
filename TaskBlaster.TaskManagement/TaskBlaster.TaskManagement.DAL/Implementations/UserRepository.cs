@@ -1,24 +1,72 @@
+using Microsoft.EntityFrameworkCore;
+using TaskBlaster.TaskManagement.DAL.Contexts;
+using TaskBlaster.TaskManagement.DAL.Entities;
 using TaskBlaster.TaskManagement.DAL.Interfaces;
 using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Models.InputModels;
-using Task = System.Threading.Tasks.Task;
 
 namespace TaskBlaster.TaskManagement.DAL.Implementations;
 
 public class UserRepository : IUserRepository
 {
-    public Task CreateUserIfNotExists(UserInputModel inputModel)
+    private readonly TaskManagementDbContext _taskManagementDbContext;
+
+    public UserRepository(TaskManagementDbContext taskManagementDbContext)
     {
-        throw new NotImplementedException();
+        _taskManagementDbContext = taskManagementDbContext;
     }
 
-    public Task<IEnumerable<UserDto>> GetAllUsers()
+    // Creates a user if it does not exist, otherwise does nothing. This is
+    // used by the post login handler to make sure users are stored
+    // within the database to keep track of users within the system
+    public async Task<int?> CreateUserIfNotExists(UserInputModel inputModel)
     {
-        throw new NotImplementedException();
+        if (await _taskManagementDbContext.Users.AnyAsync(u => u.EmailAddress == inputModel.Email))
+        {
+            return null;
+        }
+
+        User newUser = new User
+        {
+            FullName = inputModel.FullName,
+            EmailAddress = inputModel.Email,
+            ProfileImageUrl = inputModel.ProfileImageUrl,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _taskManagementDbContext.Users.AddAsync(newUser);
+        await _taskManagementDbContext.SaveChangesAsync();
+
+        return newUser.Id;
     }
 
-    public Task<UserDto?> GetUserByIdAsync(int userId)
+    public async Task<IEnumerable<UserDto>> GetAllUsers()
     {
-        throw new NotImplementedException();
+        return await _taskManagementDbContext.Users.Select(u => new UserDto
+        {
+            Id = u.Id,
+            FullName = u.FullName,
+            Email = u.EmailAddress,
+            ProfileImageUrl = u.ProfileImageUrl
+        }).ToListAsync();
+    }
+
+    public async Task<UserDto?> GetUserByIdAsync(int userId)
+    {
+        var user = await _taskManagementDbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+        {
+            return null;
+        }
+
+        return new UserDto
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            Email = user.EmailAddress,
+            ProfileImageUrl = user.ProfileImageUrl
+        };
+
     }
 }

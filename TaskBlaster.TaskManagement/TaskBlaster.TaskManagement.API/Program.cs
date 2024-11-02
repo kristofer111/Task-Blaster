@@ -1,8 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using TaskBlaster.TaskManagement.API.Services.Implementations;
+using TaskBlaster.TaskManagement.API.Services.Interfaces;
 using TaskBlaster.TaskManagement.DAL.Contexts;
+using TaskBlaster.TaskManagement.DAL.Implementations;
+using TaskBlaster.TaskManagement.DAL.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+
+builder.Services.AddTransient<IUserService, UserService>();
 
 builder.Services.AddDbContext<TaskManagementDbContext>(options =>
     options.UseNpgsql(

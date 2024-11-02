@@ -1,21 +1,58 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskBlaster.TaskManagement.API.Services.Interfaces;
 using TaskBlaster.TaskManagement.Models.Dtos;
+using TaskBlaster.TaskManagement.Models.InputModels;
 
 namespace TaskBlaster.TaskManagement.API.Controllers;
 
-[Authorize]
+// [Authorize]
 [Route("[controller]")]
 [ApiController]
 public class UsersController : ControllerBase
 {
+    private readonly IUserService _userService;
+
+    public UsersController(IUserService userService)
+    {
+        _userService = userService;
+    }
+
     /// <summary>
     /// Gets all registered users
     /// </summary>
     /// <returns>A list of all registered users</returns>
     [HttpGet("")]
-    public Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
     {
-        throw new NotImplementedException();
+        var users = await _userService.GetAllUsersAsync();
+        return Ok(users);
     }
+
+    [HttpGet("{id:int}", Name = "GetUserByIdAsync")]
+    public async Task<ActionResult<UserDto>> GetUserByIdAsync(int id)
+    {
+        var user = await _userService.GetUserByIdAsync(id);
+
+        if (user == null)
+        {
+            return NoContent();
+        }
+
+        return Ok(user);
+    }
+
+    [HttpPost("")]
+    public async Task<ActionResult> CreateUserIfNotExistsAsync([FromBody] UserInputModel userInputModel)
+    {
+        var newId = await _userService.CreateUserIfNotExistsAsync(userInputModel);
+
+        if (newId == null)
+        {
+            return NoContent();
+        }
+
+        return CreatedAtRoute("GetUserByIdAsync", new { id = newId }, null);
+    }
+
 }

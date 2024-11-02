@@ -7,14 +7,24 @@ namespace TaskBlaster.TaskManagement.API.Services.Implementations;
 
 public class UserService : IUserService
 {
-    public Task CreateUserIfNotExistsAsync(UserInputModel inputModel)
+    private readonly IUserRepository _userRepository;
+
+    public UserService(IUserRepository userRepository)
     {
-        throw new NotImplementedException();
+        _userRepository = userRepository;
     }
 
-    public Task<IEnumerable<UserDto>> GetAllUsersAsync()
+
+    public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
     {
-        throw new NotImplementedException();
+        var users = await _userRepository.GetAllUsers();
+        return users;
+    }
+
+    public async Task<int?> CreateUserIfNotExistsAsync(UserInputModel inputModel)
+    {
+        var newId = await _userRepository.CreateUserIfNotExists(inputModel);
+        return newId;
     }
 
     public Task<UserDto?> GetUserByIdAsync(int userId)

@@ -9,12 +9,12 @@ public interface IUserService
     /// Returns a list of all registered users
     /// </summary>
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
-    
+
     /// <summary>
     /// Creates a user if it does not exist.
     /// </summary>
     /// <param name="inputModel">The input model used to create the user</param>
-    Task CreateUserIfNotExistsAsync(UserInputModel inputModel);
+    Task<int?> CreateUserIfNotExistsAsync(UserInputModel inputModel);
 
     /// <summary>
     /// Get a user by id

@@ -14,12 +14,12 @@ public class Task
     public DateTime CreatedAt { get; set; }
     public DateTime? DueDate { get; set; }
     [ForeignKey("Priority")] public int? PriorityId { get; set; }
-    public Priority Priority { get; set; } = null!;
+    public Priority Priority { get; set; }
     [ForeignKey("Status")] public int? StatusId { get; set; }
-    public Status Status { get; set; } = null!;
+    public Status Status { get; set; }
     [ForeignKey("AssignedTo")] public int? AssignedToId { get; set; }
-    public User AssignedTo { get; set; } = null!;
+    public User AssignedTo { get; set; }
     [ForeignKey("CreatedBy")] public int? CreatedById { get; set; }
-    public User CreatedBy { get; set; } = null!;
-    public bool IsArchived { get; set; }
+    public User CreatedBy { get; set; }
+    public bool IsArchived { get; set; } = false;
 }

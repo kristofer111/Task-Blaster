@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using Microsoft.EntityFrameworkCore;
 using TaskBlaster.TaskManagement.DAL.Contexts;
 using TaskBlaster.TaskManagement.DAL.Interfaces;
 using TaskBlaster.TaskManagement.Models;
@@ -27,17 +29,22 @@ public class TaskRepository : ITaskRepository
 
     public async Task<int> CreateNewTaskAsync(TaskInputModel task)
     {
-        _taskManagementDbContext.Tasks.Add(new Entities.Task
+        var newTask = new Entities.Task
         {
             Title = task.Title,
             Description = task.Description,
             CreatedAt = DateTime.UtcNow,
             DueDate = task.DueDate,
             PriorityId = task.PriorityId,
-            StatusId = 1,
-        });
+            StatusId = task.StatusId,
+            AssignedToId = null,
+            CreatedById = null,
+        };
 
-        throw new NotImplementedException();
+        await _taskManagementDbContext.Tasks.AddAsync(newTask);
+        _taskManagementDbContext.SaveChanges();
+
+        return newTask.Id;
     }
 
     public Task<Envelope<TaskDto>> GetPaginatedTasksByCriteriaAsync(TaskCriteriaQueryParams query)
@@ -45,9 +52,32 @@ public class TaskRepository : ITaskRepository
         throw new NotImplementedException();
     }
 
-    public Task<TaskDetailsDto?> GetTaskByIdAsync(int taskId)
+    public async Task<TaskDetailsDto?> GetTaskByIdAsync(int taskId)
     {
-        throw new NotImplementedException();
+        var task = await _taskManagementDbContext.Tasks
+            .Include(t => t.Status)
+            .Include(t => t.Priority)
+            .Include(t => t.CreatedBy)
+            .Include(t => t.AssignedTo)
+            .FirstOrDefaultAsync(t => t.Id == taskId);
+
+        if (task == null)
+        {
+            return null;
+        }
+
+        return new TaskDetailsDto
+        {
+            Id = task.Id,
+            Title = task.Title,
+            Description = task.Description,
+            Status = task.Status.Name,
+            Priority = task.Priority.Name,
+            CreatedAt = task.CreatedAt,
+            DueDate = task.DueDate,
+            CreatedBy = task.CreatedBy.FullName,
+            AssignedToUser = task.AssignedTo.FullName,
+        };
     }
 
     public Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
