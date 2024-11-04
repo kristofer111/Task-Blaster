@@ -33,22 +33,6 @@ public class TaskRepository : ITaskRepository
 
     public async Task<int?> CreateNewTaskAsync(TaskInputModel task)
     {
-        // var authUser = _httpContextAccessor.HttpContext?.User;
-        // Console.WriteLine("authUser:", authUser);
-
-        // var emailClaim = authUser?.Claims.FirstOrDefault(c => c.Type == "email")?.Value ?? "";
-        // Console.WriteLine("emailClaim:", emailClaim);
-
-        // var user = await _taskManagementDbContext.Users
-        //     .FirstOrDefaultAsync(u => u.EmailAddress == emailClaim);
-        // Console.WriteLine("user:", user);
-
-        // var emailClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("email");
-        // Console.WriteLine("emailClaim:", emailClaim);
-
-        // var email = emailClaim?.Value;
-        // Console.WriteLine("Email:", email);
-
         var email = _profileService.GetUserEmail();
         Console.WriteLine("email:", email);
 
@@ -62,7 +46,7 @@ public class TaskRepository : ITaskRepository
         var newTask = new Entities.Task
         {
             Title = task.Title,
-            Description = task.Description,
+            Description = email,
             CreatedAt = DateTime.UtcNow,
             DueDate = task.DueDate,
             PriorityId = task.PriorityId,

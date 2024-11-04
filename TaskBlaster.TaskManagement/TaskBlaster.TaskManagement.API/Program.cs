@@ -32,7 +32,7 @@ builder.Services.AddDbContext<TaskManagementDbContext>(options =>
     )
 );
 
-// builder.Services.AddMvc();
+builder.Services.AddMvc();
 
 builder.Services.AddAuthentication(options =>
 {
