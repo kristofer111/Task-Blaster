@@ -16,5 +16,5 @@ public interface ITagService
     /// </summary>
     /// <param name="inputModel">The input model used to create the new tag</param>
     /// <returns>The ID of the newly created tag</returns>
-    Task CreateNewTagAsync(TagInputModel inputModel);
+    Task<int?> CreateNewTagAsync(TagInputModel inputModel);
 }

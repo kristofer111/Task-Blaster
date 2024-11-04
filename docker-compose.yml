@@ -1,6 +1,7 @@
 services:
+
   task-blaster-db:
-    image: postgres
+    image: postgres:latest
     container_name: task-blaster-db
     ports:
       - "5432:5432"
@@ -8,8 +9,25 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=TaskBlaster
-    # networks:
-    #   - task-blaster-network
+    # volumes:
+    #   - postgres_data:/var/lib/postgresql/data
+    networks:
+      - task-blaster-network
+
+  task-management:
+    build:
+      context: ./TaskBlaster.TaskManagement
+      dockerfile: Dockerfile
+    container_name: task-management
+    ports:
+      - "6060:5212"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5212
+      - ConnectionStrings__TaskBlasterDatabaseConnectionString=Host=task-blaster-db;Port=5432;Database=TaskBlaster;Username=admin;Password=admin
+    networks:
+      - task-blaster-network
+
 networks:
   task-blaster-network:
     driver: bridge

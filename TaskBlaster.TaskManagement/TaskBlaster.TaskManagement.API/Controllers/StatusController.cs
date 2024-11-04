@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskBlaster.TaskManagement.API.Services.Interfaces;
 using TaskBlaster.TaskManagement.Models.Dtos;
 
 namespace TaskBlaster.TaskManagement.API.Controllers;
@@ -7,13 +8,21 @@ namespace TaskBlaster.TaskManagement.API.Controllers;
 [ApiController]
 public class StatusController : ControllerBase
 {
+    private readonly IStatusService _statusService;
+
+    public StatusController(IStatusService statusService)
+    {
+        _statusService = statusService;
+    }
+
     /// <summary>
     /// Returns a list of all statuses
     /// </summary>
     /// <returns>A list of all statuses</returns>
     [HttpGet("")]
-    public Task<ActionResult<IEnumerable<StatusDto>>> GetAllStatuses()
+    public async Task<ActionResult<IEnumerable<StatusDto>>> GetAllStatuses()
     {
-        throw new NotImplementedException();
+        IEnumerable<StatusDto> statuses = await _statusService.GetAllStatusesAsync();
+        return Ok(statuses);
     }
 }

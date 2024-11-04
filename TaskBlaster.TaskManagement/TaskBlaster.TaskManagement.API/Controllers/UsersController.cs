@@ -36,7 +36,7 @@ public class UsersController : ControllerBase
 
         if (user == null)
         {
-            return NoContent();
+            return Conflict(new { Message = "Email address already taken" });
         }
 
         return Ok(user);

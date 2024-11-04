@@ -22,4 +22,5 @@ public class Task
     [ForeignKey("CreatedBy")] public int? CreatedById { get; set; }
     public User CreatedBy { get; set; }
     public bool IsArchived { get; set; } = false;
+    public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 }

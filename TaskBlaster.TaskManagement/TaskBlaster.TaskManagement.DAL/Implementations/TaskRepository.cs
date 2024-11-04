@@ -1,20 +1,24 @@
-using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using TaskBlaster.TaskManagement.DAL.Contexts;
 using TaskBlaster.TaskManagement.DAL.Interfaces;
 using TaskBlaster.TaskManagement.Models;
 using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Models.InputModels;
+using Task = System.Threading.Tasks.Task;
+using Microsoft.AspNetCore.Http;
+using TaskBlaster.TaskManagement.API.Services.Interfaces;
 
 namespace TaskBlaster.TaskManagement.DAL.Implementations;
 
 public class TaskRepository : ITaskRepository
 {
     private readonly TaskManagementDbContext _taskManagementDbContext;
+    private readonly IProfileService _profileService;
 
-    public TaskRepository(TaskManagementDbContext taskManagementDbContext)
+    public TaskRepository(TaskManagementDbContext taskManagementDbContext, IProfileService profileService)
     {
         _taskManagementDbContext = taskManagementDbContext;
+        _profileService = profileService;
     }
 
     public Task ArchiveTaskByIdAsync(int taskId)
@@ -27,8 +31,34 @@ public class TaskRepository : ITaskRepository
         throw new NotImplementedException();
     }
 
-    public async Task<int> CreateNewTaskAsync(TaskInputModel task)
+    public async Task<int?> CreateNewTaskAsync(TaskInputModel task)
     {
+        // var authUser = _httpContextAccessor.HttpContext?.User;
+        // Console.WriteLine("authUser:", authUser);
+
+        // var emailClaim = authUser?.Claims.FirstOrDefault(c => c.Type == "email")?.Value ?? "";
+        // Console.WriteLine("emailClaim:", emailClaim);
+
+        // var user = await _taskManagementDbContext.Users
+        //     .FirstOrDefaultAsync(u => u.EmailAddress == emailClaim);
+        // Console.WriteLine("user:", user);
+
+        // var emailClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("email");
+        // Console.WriteLine("emailClaim:", emailClaim);
+
+        // var email = emailClaim?.Value;
+        // Console.WriteLine("Email:", email);
+
+        var email = _profileService.GetUserEmail();
+        Console.WriteLine("email:", email);
+
+        if (email == null)
+        {
+            return null;
+        }
+
+        // var createById = user.Id;
+
         var newTask = new Entities.Task
         {
             Title = task.Title,
@@ -38,7 +68,7 @@ public class TaskRepository : ITaskRepository
             PriorityId = task.PriorityId,
             StatusId = task.StatusId,
             AssignedToId = null,
-            CreatedById = null,
+            // CreatedById = createById,
         };
 
         await _taskManagementDbContext.Tasks.AddAsync(newTask);
@@ -59,6 +89,7 @@ public class TaskRepository : ITaskRepository
             .Include(t => t.Priority)
             .Include(t => t.CreatedBy)
             .Include(t => t.AssignedTo)
+            .Include(t => t.Tags)
             .FirstOrDefaultAsync(t => t.Id == taskId);
 
         if (task == null)
@@ -77,6 +108,18 @@ public class TaskRepository : ITaskRepository
             DueDate = task.DueDate,
             CreatedBy = task.CreatedBy.FullName,
             AssignedToUser = task.AssignedTo.FullName,
+            Tags = task.Tags
+                .Select(tag => tag.Name)
+                .ToList(),
+            Comments = _taskManagementDbContext.Comments
+                .Where(c => c.TaskId == taskId)
+                .Select(c => new CommentDto
+                {
+                    Id = c.Id,
+                    Author = c.Author,
+                    ContentAsMarkdown = c.ContentAsMarkdown,
+                    CreatedAt = c.CreatedDate
+                }).ToList()
         };
     }
 

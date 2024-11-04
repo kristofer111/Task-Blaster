@@ -1,19 +1,50 @@
+using Microsoft.EntityFrameworkCore;
+using TaskBlaster.TaskManagement.DAL.Contexts;
+using TaskBlaster.TaskManagement.DAL.Entities;
 using TaskBlaster.TaskManagement.DAL.Interfaces;
 using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Models.InputModels;
-using Task = System.Threading.Tasks.Task;
 
 namespace TaskBlaster.TaskManagement.DAL.Implementations;
 
 public class TagRepository : ITagRepository
 {
-    public Task CreateNewTagAsync(TagInputModel inputModel)
+    private readonly TaskManagementDbContext _taskManagementDbContext;
+
+    public TagRepository(TaskManagementDbContext taskManagementDbContext)
     {
-        throw new NotImplementedException();
+        _taskManagementDbContext = taskManagementDbContext;
     }
 
-    public Task<IEnumerable<TagDto>> GetAllTagsAsync()
+
+    public async Task<int?> CreateNewTagAsync(TagInputModel inputModel)
     {
-        throw new NotImplementedException();
+        bool ans = await _taskManagementDbContext.Tags.AnyAsync(t => t.Name == inputModel.Name);
+
+        if (ans)
+        {
+            return null;
+        }
+
+        var tag = new Tag
+        {
+            Name = inputModel.Name,
+            Description = inputModel.Description
+        };
+
+        await _taskManagementDbContext.AddAsync(tag);
+        await _taskManagementDbContext.SaveChangesAsync();
+
+        return tag.Id;
+    }
+
+    public async Task<IEnumerable<TagDto>> GetAllTagsAsync()
+    {
+        return await _taskManagementDbContext.Tags.Select(t => new TagDto
+        {
+            Id = t.Id,
+            Name = t.Name,
+            Description = t.Description
+        }).ToListAsync();
     }
 }

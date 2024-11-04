@@ -1,4 +1,5 @@
 using TaskBlaster.TaskManagement.API.Services.Interfaces;
+using TaskBlaster.TaskManagement.DAL.Interfaces;
 using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Models.InputModels;
 
@@ -6,13 +7,22 @@ namespace TaskBlaster.TaskManagement.API.Services.Implementations;
 
 public class TagService : ITagService
 {
-    public Task<IEnumerable<TagDto>> GetAllTagsAsync()
+    private readonly ITagRepository _tagRepository;
+
+    public TagService(ITagRepository tagRepository)
     {
-        throw new NotImplementedException();
+        _tagRepository = tagRepository;
     }
 
-    public Task CreateNewTagAsync(TagInputModel inputModel)
+
+    public async Task<IEnumerable<TagDto>> GetAllTagsAsync()
     {
-        throw new NotImplementedException();
+        return await _tagRepository.GetAllTagsAsync();
+    }
+
+    public async Task<int?> CreateNewTagAsync(TagInputModel inputModel)
+    {
+        var newId = await _tagRepository.CreateNewTagAsync(inputModel);
+        return newId;
     }
 }

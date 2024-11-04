@@ -6,5 +6,5 @@ namespace TaskBlaster.TaskManagement.DAL.Interfaces;
 public interface ITagRepository
 {
     Task<IEnumerable<TagDto>> GetAllTagsAsync();
-    Task CreateNewTagAsync(TagInputModel inputModel);
+    Task<int?> CreateNewTagAsync(TagInputModel inputModel);
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskBlaster.TaskManagement.API.Services.Interfaces;
 using TaskBlaster.TaskManagement.Models.Dtos;
 
 namespace TaskBlaster.TaskManagement.API.Controllers;
@@ -7,13 +8,21 @@ namespace TaskBlaster.TaskManagement.API.Controllers;
 [ApiController]
 public class PrioritiesController : ControllerBase
 {
+    private readonly IPriorityService _priorityService;
+
+    public PrioritiesController(IPriorityService priorityService)
+    {
+        _priorityService = priorityService;
+    }
+
     /// <summary>
     /// Returns a list of all priorities
     /// </summary>
     /// <returns>A list of all priorities</returns>
     [HttpGet("")]
-    public Task<ActionResult<IEnumerable<PriorityDto>>> GetAllPriorities()
+    public async Task<ActionResult<IEnumerable<PriorityDto>>> GetAllPriorities()
     {
-        throw new NotImplementedException();
+        IEnumerable<PriorityDto> priorities = await _priorityService.GetAllPrioritiesAsync();
+        return Ok(priorities);
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskBlaster.TaskManagement.API.Services.Interfaces;
 using TaskBlaster.TaskManagement.Models;
 using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Models.InputModels;
@@ -11,6 +12,14 @@ namespace TaskBlaster.TaskManagement.API.Controllers;
 [Route("[controller]")]
 public class TasksController : ControllerBase
 {
+    private readonly ITaskService _taskService;
+
+    public TasksController(ITaskService taskService)
+    {
+        _taskService = taskService;
+    }
+
+
     /// <summary>
     /// Returns all tasks by a provided criteria as a paginated result
     /// </summary>
@@ -28,9 +37,16 @@ public class TasksController : ControllerBase
     /// <param name="taskId">The id of the task</param>
     /// <returns>A single task or null</returns>
     [HttpGet("{taskId}", Name = "GetTaskById")]
-    public Task<ActionResult<TaskDetailsDto?>> GetTaskById(int taskId)
+    public async Task<ActionResult<TaskDetailsDto?>> GetTaskById(int taskId)
     {
-        throw new NotImplementedException();
+        var task = await _taskService.GetTaskByIdAsync(taskId);
+
+        if (task == null)
+        {
+            return NoContent();
+        }
+
+        return Ok(task);
     }
 
     /// <summary>
@@ -38,11 +54,16 @@ public class TasksController : ControllerBase
     /// </summary>
     /// <param name="task">Input model used to populate the new task</param>
     [HttpPost("")]
-    public Task<ActionResult> CreateNewTask([FromBody] TaskInputModel task)
+    public async Task<ActionResult> CreateNewTask([FromBody] TaskInputModel task)
     {
-        throw new NotImplementedException();
+        var newId = await _taskService.CreateNewTaskAsync(task);
+        if (newId == null)
+        {
+            return Conflict("newId is null");
+        }
+        return Ok(newId);
     }
-    
+
     /// <summary>
     /// Archives a task by id
     /// </summary>
@@ -63,7 +84,7 @@ public class TasksController : ControllerBase
     {
         throw new NotImplementedException();
     }
-    
+
     /// <summary>
     /// Unassigns a user from a task by id
     /// </summary>
@@ -85,7 +106,7 @@ public class TasksController : ControllerBase
     {
         throw new NotImplementedException();
     }
-    
+
     /// <summary>
     /// Updates the priority of a task, e.g. 'Critical', 'High'
     /// </summary>
@@ -118,7 +139,7 @@ public class TasksController : ControllerBase
     {
         throw new NotImplementedException();
     }
-    
+
     /// <summary>
     /// Removes a comment from a task
     /// </summary>
