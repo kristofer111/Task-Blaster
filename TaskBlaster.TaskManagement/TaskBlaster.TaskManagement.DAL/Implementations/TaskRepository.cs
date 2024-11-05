@@ -15,11 +15,14 @@ public class TaskRepository : ITaskRepository
 {
     private readonly TaskManagementDbContext _taskManagementDbContext;
     private readonly IProfileService _profileService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private const string Namespace = "https://task-management-web-api.com";
 
-    public TaskRepository(TaskManagementDbContext taskManagementDbContext, IProfileService profileService)
+    public TaskRepository(TaskManagementDbContext taskManagementDbContext, IProfileService profileService, IHttpContextAccessor httpContextAccessor)
     {
         _taskManagementDbContext = taskManagementDbContext;
         _profileService = profileService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public Task ArchiveTaskByIdAsync(int taskId)
@@ -40,28 +43,33 @@ public class TaskRepository : ITaskRepository
             .FirstOrDefaultAsync(u => u.Id.ToString() == task.AssignedToUser);
 
         // var emailClaim = _profileService.GetUserEmail();
-        Console.WriteLine("EmailClaim:", emailClaim);
+        var authUser = _httpContextAccessor.HttpContext?.User;
+        var userName = authUser?.Claims.FirstOrDefault(c => c.Type == $"{Namespace}name")?.Value ?? "";
+        Console.WriteLine($"{userName}");
+
+        var email = $"{userName}";
+        Console.WriteLine(email);
 
         var createdByUser = await _taskManagementDbContext.Users
-            .FirstOrDefaultAsync(u => u.EmailAddress == emailClaim);
+            .FirstOrDefaultAsync(u => u.EmailAddress == email);
 
-        if (createdByUser == null)
-        {
-            return null;
-        }
+        // if (createdByUser == null)
+        // {
+        //     return null;
+        // }
 
-        var createById = createdByUser.Id;
+        // var createById = createdByUser.Id;
 
         var newTask = new Entities.Task
         {
             Title = task.Title,
-            Description = task.Description,
+            Description = userName,
             CreatedAt = DateTime.UtcNow,
             DueDate = task.DueDate,
             PriorityId = task.PriorityId,
             StatusId = task.StatusId,
             AssignedToId = assignedToUser.Id,
-            CreatedById = createById,
+            CreatedById = null,
         };
 
         await _taskManagementDbContext.Tasks.AddAsync(newTask);
