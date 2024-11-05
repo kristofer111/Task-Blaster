@@ -9,6 +9,8 @@ using TaskBlaster.TaskManagement.DAL.Implementations;
 using TaskBlaster.TaskManagement.DAL.Interfaces;
 using TaskBlaster.TaskManagement.Models.InputModels;
 
+const string Namespace = "https://task-management-web-api.com";
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<IPriorityRepository, PriorityRepository>();
@@ -23,8 +25,8 @@ builder.Services.AddTransient<ITaskService, TaskService>();
 builder.Services.AddTransient<IStatusService, StatusService>();
 builder.Services.AddTransient<ITagService, TagService>();
 
+builder.Services.AddTransient<IClaimsUtility, ClamsUtility>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddTransient<IProfileService, ProfileService>();
 
 
 builder.Services.AddDbContext<TaskManagementDbContext>(options =>
@@ -35,24 +37,6 @@ builder.Services.AddDbContext<TaskManagementDbContext>(options =>
 );
 
 builder.Services.AddMvc();
-
-// builder.Services.AddAuthentication(options =>
-// {
-//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-// }).AddJwtBearer(options =>
-// {
-//     options.Authority = builder.Configuration.GetValue<string>("Auth0:Authority");
-//     options.Audience = builder.Configuration.GetValue<string>("Auth0:Audience");
-//     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-//     {
-//         ValidateIssuer = true,
-//         ValidateAudience = true,
-//         ValidateLifetime = true,
-//         ValidateIssuerSigningKey = true
-//     };
-// });
-
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -72,8 +56,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     return;
                 }
 
-                var emailClaim = user.FindFirst(ClaimTypes.Email)?.Value ?? user.FindFirst("email")?.Value;
-                var nameClaim = user.FindFirst(ClaimTypes.Name)?.Value ?? user.FindFirst("name")?.Value;
+                var emailClaim = user.FindFirst(ClaimTypes.Email)?.Value ?? user.FindFirst($"{Namespace}email")?.Value;
+                var nameClaim = user.FindFirst(ClaimTypes.Name)?.Value ?? user.FindFirst($"{Namespace}name")?.Value;
 
                 var pictureClaim = user.FindFirst("picture")?.Value;
                 var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
@@ -85,7 +69,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     return;
                 }
 
-                var userInput = new UserInputModel
+                var userInputModel = new UserInputModel
                 {
                     Email = emailClaim,
                     FullName = nameClaim,
@@ -94,11 +78,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
                 try
                 {
-                    await userService.CreateUserIfNotExistsAsync(userInput);
+                    await userService.CreateUserIfNotExistsAsync(userInputModel);
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Error creating/updating user from token");
+                    logger.LogError(ex, "Error creating/updating user with Email: {EmailClaim}, Name: {NameClaim} from token", 
+                        emailClaim, nameClaim);
                 }
             }
         };

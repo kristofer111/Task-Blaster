@@ -5,24 +5,18 @@ using TaskBlaster.TaskManagement.Models;
 using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Models.InputModels;
 using Task = System.Threading.Tasks.Task;
-using Microsoft.AspNetCore.Http;
 using TaskBlaster.TaskManagement.API.Services.Interfaces;
-using Npgsql.Replication;
 
 namespace TaskBlaster.TaskManagement.DAL.Implementations;
 
 public class TaskRepository : ITaskRepository
 {
     private readonly TaskManagementDbContext _taskManagementDbContext;
-    private readonly IProfileService _profileService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private const string Namespace = "https://task-management-web-api.com";
-
-    public TaskRepository(TaskManagementDbContext taskManagementDbContext, IProfileService profileService, IHttpContextAccessor httpContextAccessor)
+    private readonly IClaimsUtility _claimsUtility;
+    public TaskRepository(TaskManagementDbContext taskManagementDbContext, IClaimsUtility claimsUtility)
     {
         _taskManagementDbContext = taskManagementDbContext;
-        _profileService = profileService;
-        _httpContextAccessor = httpContextAccessor;
+        _claimsUtility = claimsUtility;
     }
 
     public Task ArchiveTaskByIdAsync(int taskId)
@@ -35,41 +29,33 @@ public class TaskRepository : ITaskRepository
         throw new NotImplementedException();
     }
 
-    public async Task<int?> CreateNewTaskAsync(TaskInputModel task, string emailClaim)
+    public async Task<int?> CreateNewTaskAsync(TaskInputModel task)
     {
         var assignedToUser = await _taskManagementDbContext.Users
             .FirstOrDefaultAsync(u => u.EmailAddress == task.AssignedToUser) ??
             await _taskManagementDbContext.Users
-            .FirstOrDefaultAsync(u => u.Id.ToString() == task.AssignedToUser);
+                .FirstOrDefaultAsync(u => u.Id.ToString() == task.AssignedToUser) ?? null;
 
-        // var emailClaim = _profileService.GetUserEmail();
-        var authUser = _httpContextAccessor.HttpContext?.User;
-        var userName = authUser?.Claims.FirstOrDefault(c => c.Type == $"{Namespace}name")?.Value ?? "";
-        Console.WriteLine($"{userName}");
-
-        var email = $"{userName}";
-        Console.WriteLine(email);
+        var emailClaim = _claimsUtility.RetrieveUserEmailClaim();
 
         var createdByUser = await _taskManagementDbContext.Users
-            .FirstOrDefaultAsync(u => u.EmailAddress == email);
+            .FirstOrDefaultAsync(u => u.EmailAddress == emailClaim);
 
-        // if (createdByUser == null)
-        // {
-        //     return null;
-        // }
-
-        // var createById = createdByUser.Id;
+        if (createdByUser == null)
+        {
+            return null;
+        }
 
         var newTask = new Entities.Task
         {
             Title = task.Title,
-            Description = userName,
+            Description = task.Description,
             CreatedAt = DateTime.UtcNow,
             DueDate = task.DueDate,
             PriorityId = task.PriorityId,
             StatusId = task.StatusId,
-            AssignedToId = assignedToUser.Id,
-            CreatedById = null,
+            AssignedToId = assignedToUser?.Id,
+            CreatedById = createdByUser.Id
         };
 
         await _taskManagementDbContext.Tasks.AddAsync(newTask);

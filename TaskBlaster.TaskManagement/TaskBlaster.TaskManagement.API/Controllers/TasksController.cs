@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using TaskBlaster.TaskManagement.API.Services.Interfaces;
 using TaskBlaster.TaskManagement.Models;
 using TaskBlaster.TaskManagement.Models.Dtos;
@@ -8,14 +7,13 @@ using TaskBlaster.TaskManagement.Models.InputModels;
 
 namespace TaskBlaster.TaskManagement.API.Controllers;
 
-[Authorize]
+// [Authorize]
 [ApiController]
 [Route("[controller]")]
 public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
-    private const string Namespace = "https://task-management-web-api.com";
-
+    
     public TasksController(ITaskService taskService)
     {
         _taskService = taskService;
@@ -45,7 +43,7 @@ public class TasksController : ControllerBase
 
         if (task == null)
         {
-            return NoContent();
+            return NotFound(new { message = $"Task with id {taskId} was not found" });
         }
 
         return Ok(task);
@@ -58,15 +56,13 @@ public class TasksController : ControllerBase
     [HttpPost("")]
     public async Task<ActionResult> CreateNewTask([FromBody] TaskInputModel task)
     {
-        var emailClaim = User.Claims.FirstOrDefault(c => c.Type == $"{Namespace}email")?.Value;
-        Console.WriteLine($"Controller Email Claim: {emailClaim}");
-
-        var newId = await _taskService.CreateNewTaskAsync(task, emailClaim);
+        var newId = await _taskService.CreateNewTaskAsync(task);
 
         if (newId == null)
         {
-            return Conflict("newId is null");
+            return BadRequest(new { message = "Task could not be created because the token is missing required claims" });
         }
+
         return Ok(newId);
     }
 
