@@ -21,10 +21,9 @@ public class UserService : IUserService
         return users;
     }
 
-    public async Task<int?> CreateUserIfNotExistsAsync(UserInputModel inputModel)
+    public async Task CreateUserIfNotExistsAsync(UserInputModel inputModel)
     {
-        var newId = await _userRepository.CreateUserIfNotExists(inputModel);
-        return newId;
+        await _userRepository.CreateUserIfNotExists(inputModel);
     }
 
     public Task<UserDto?> GetUserByIdAsync(int userId)

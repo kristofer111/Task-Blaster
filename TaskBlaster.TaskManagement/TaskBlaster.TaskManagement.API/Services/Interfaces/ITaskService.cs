@@ -24,7 +24,7 @@ public interface ITaskService
     /// Creates a new task
     /// </summary>
     /// <param name="task">Input model used to populate the new task</param>
-    Task<int?> CreateNewTaskAsync(TaskInputModel task);
+    Task<int?> CreateNewTaskAsync(TaskInputModel task, string emailClaim);
 
     /// <summary>
     /// Archives a task by id

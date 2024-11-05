@@ -29,7 +29,7 @@ public class UsersController : ControllerBase
         return Ok(users);
     }
 
-    [HttpGet("{id:int}", Name = "GetUserByIdAsync")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<UserDto>> GetUserByIdAsync(int id)
     {
         var user = await _userService.GetUserByIdAsync(id);
@@ -45,14 +45,8 @@ public class UsersController : ControllerBase
     [HttpPost("")]
     public async Task<ActionResult> CreateUserIfNotExistsAsync([FromBody] UserInputModel userInputModel)
     {
-        var newId = await _userService.CreateUserIfNotExistsAsync(userInputModel);
-
-        if (newId == null)
-        {
-            return NoContent();
-        }
-
-        return CreatedAtRoute("GetUserByIdAsync", new { id = newId }, null);
+        await _userService.CreateUserIfNotExistsAsync(userInputModel);
+        return Ok();
     }
 
 }

@@ -15,9 +15,9 @@ namespace Gateway.Controllers
         {
             return Ok(new
             {
-                User.Identity?.Name,
+                Name = User.Claims.FirstOrDefault(c => c.Type == $"{Namespace}name")?.Value,
                 EmailAddress = User.Claims.FirstOrDefault(c => c.Type == $"{Namespace}email")?.Value,
-                ProfileImage = User.Claims.FirstOrDefault(c => c.Type == "picture")?.Value
+                ProfileImage = User.Claims.FirstOrDefault(c => c.Type == $"{Namespace}picture")?.Value
             });
         }
     }

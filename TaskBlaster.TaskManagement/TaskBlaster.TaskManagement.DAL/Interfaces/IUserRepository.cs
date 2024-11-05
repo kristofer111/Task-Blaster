@@ -6,6 +6,6 @@ namespace TaskBlaster.TaskManagement.DAL.Interfaces;
 public interface IUserRepository
 {
     Task<IEnumerable<UserDto>> GetAllUsers();
-    Task<int?> CreateUserIfNotExists(UserInputModel inputModel);
+    Task CreateUserIfNotExists(UserInputModel inputModel);
     Task<UserDto?> GetUserByIdAsync(int userId);
 }

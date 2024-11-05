@@ -4,6 +4,7 @@ using TaskBlaster.TaskManagement.DAL.Entities;
 using TaskBlaster.TaskManagement.DAL.Interfaces;
 using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Models.InputModels;
+using Task = System.Threading.Tasks.Task;
 
 namespace TaskBlaster.TaskManagement.DAL.Implementations;
 
@@ -19,25 +20,23 @@ public class UserRepository : IUserRepository
     // Creates a user if it does not exist, otherwise does nothing. This is
     // used by the post login handler to make sure users are stored
     // within the database to keep track of users within the system
-    public async Task<int?> CreateUserIfNotExists(UserInputModel inputModel)
+    public async Task CreateUserIfNotExists(UserInputModel inputModel)
     {
-        if (await _taskManagementDbContext.Users.AnyAsync(u => u.EmailAddress == inputModel.Email))
+        bool userHasEmail = await _taskManagementDbContext.Users.AnyAsync(u => u.EmailAddress == inputModel.Email);
+
+        if (!userHasEmail)
         {
-            return null;
+            User newUser = new User
+            {
+                FullName = inputModel.FullName,
+                EmailAddress = inputModel.Email,
+                ProfileImageUrl = inputModel.ProfileImageUrl,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _taskManagementDbContext.Users.AddAsync(newUser);
+            await _taskManagementDbContext.SaveChangesAsync();
         }
-
-        User newUser = new User
-        {
-            FullName = inputModel.FullName,
-            EmailAddress = inputModel.Email,
-            ProfileImageUrl = inputModel.ProfileImageUrl,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        await _taskManagementDbContext.Users.AddAsync(newUser);
-        await _taskManagementDbContext.SaveChangesAsync();
-
-        return newUser.Id;
     }
 
     public async Task<IEnumerable<UserDto>> GetAllUsers()

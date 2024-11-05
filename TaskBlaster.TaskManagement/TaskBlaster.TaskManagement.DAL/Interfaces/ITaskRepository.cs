@@ -10,7 +10,7 @@ public interface ITaskRepository
 
     Task<TaskDetailsDto?> GetTaskByIdAsync(int taskId);
 
-    Task<int?> CreateNewTaskAsync(TaskInputModel task);
+    Task<int?> CreateNewTaskAsync(TaskInputModel task, string emailClaim);
 
     Task ArchiveTaskByIdAsync(int taskId);
 

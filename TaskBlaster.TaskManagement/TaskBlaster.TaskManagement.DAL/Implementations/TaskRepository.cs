@@ -7,6 +7,7 @@ using TaskBlaster.TaskManagement.Models.InputModels;
 using Task = System.Threading.Tasks.Task;
 using Microsoft.AspNetCore.Http;
 using TaskBlaster.TaskManagement.API.Services.Interfaces;
+using Npgsql.Replication;
 
 namespace TaskBlaster.TaskManagement.DAL.Implementations;
 
@@ -31,32 +32,40 @@ public class TaskRepository : ITaskRepository
         throw new NotImplementedException();
     }
 
-    public async Task<int?> CreateNewTaskAsync(TaskInputModel task)
+    public async Task<int?> CreateNewTaskAsync(TaskInputModel task, string emailClaim)
     {
-        var email = _profileService.GetUserEmail();
-        Console.WriteLine("email:", email);
+        var assignedToUser = await _taskManagementDbContext.Users
+            .FirstOrDefaultAsync(u => u.EmailAddress == task.AssignedToUser) ??
+            await _taskManagementDbContext.Users
+            .FirstOrDefaultAsync(u => u.Id.ToString() == task.AssignedToUser);
 
-        if (email == null)
+        // var emailClaim = _profileService.GetUserEmail();
+        Console.WriteLine("EmailClaim:", emailClaim);
+
+        var createdByUser = await _taskManagementDbContext.Users
+            .FirstOrDefaultAsync(u => u.EmailAddress == emailClaim);
+
+        if (createdByUser == null)
         {
             return null;
         }
 
-        // var createById = user.Id;
+        var createById = createdByUser.Id;
 
         var newTask = new Entities.Task
         {
             Title = task.Title,
-            Description = email,
+            Description = task.Description,
             CreatedAt = DateTime.UtcNow,
             DueDate = task.DueDate,
             PriorityId = task.PriorityId,
             StatusId = task.StatusId,
-            AssignedToId = null,
-            // CreatedById = createById,
+            AssignedToId = assignedToUser.Id,
+            CreatedById = createById,
         };
 
         await _taskManagementDbContext.Tasks.AddAsync(newTask);
-        _taskManagementDbContext.SaveChanges();
+        await _taskManagementDbContext.SaveChangesAsync();
 
         return newTask.Id;
     }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using TaskBlaster.TaskManagement.API.Services.Interfaces;
 using TaskBlaster.TaskManagement.Models;
 using TaskBlaster.TaskManagement.Models.Dtos;
@@ -13,6 +14,7 @@ namespace TaskBlaster.TaskManagement.API.Controllers;
 public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
+    private const string Namespace = "https://task-management-web-api.com";
 
     public TasksController(ITaskService taskService)
     {
@@ -56,7 +58,11 @@ public class TasksController : ControllerBase
     [HttpPost("")]
     public async Task<ActionResult> CreateNewTask([FromBody] TaskInputModel task)
     {
-        var newId = await _taskService.CreateNewTaskAsync(task);
+        var emailClaim = User.Claims.FirstOrDefault(c => c.Type == $"{Namespace}email")?.Value;
+        Console.WriteLine($"Controller Email Claim: {emailClaim}");
+
+        var newId = await _taskService.CreateNewTaskAsync(task, emailClaim);
+
         if (newId == null)
         {
             return Conflict("newId is null");

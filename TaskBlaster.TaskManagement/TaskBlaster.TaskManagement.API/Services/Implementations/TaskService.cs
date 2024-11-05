@@ -27,9 +27,9 @@ public class TaskService : ITaskService
         return task;
     }
 
-    public async Task<int?> CreateNewTaskAsync(TaskInputModel task)
+    public async Task<int?> CreateNewTaskAsync(TaskInputModel task, string emailClaim)
     {
-        return await _taskRepository.CreateNewTaskAsync(task);
+        return await _taskRepository.CreateNewTaskAsync(task, emailClaim);
     }
 
     public Task ArchiveTaskByIdAsync(int taskId)

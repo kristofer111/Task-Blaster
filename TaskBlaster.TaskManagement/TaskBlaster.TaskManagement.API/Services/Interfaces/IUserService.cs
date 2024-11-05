@@ -14,7 +14,7 @@ public interface IUserService
     /// Creates a user if it does not exist.
     /// </summary>
     /// <param name="inputModel">The input model used to create the user</param>
-    Task<int?> CreateUserIfNotExistsAsync(UserInputModel inputModel);
+    Task CreateUserIfNotExistsAsync(UserInputModel inputModel);
 
     /// <summary>
     /// Get a user by id
