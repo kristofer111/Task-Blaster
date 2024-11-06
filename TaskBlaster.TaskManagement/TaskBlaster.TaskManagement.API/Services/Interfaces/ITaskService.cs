@@ -58,5 +58,11 @@ public interface ITaskService
     /// </summary>
     /// <param name="taskId">The id of the task</param>
     /// <param name="inputModel">The input model associated with the priority update</param>
-    Task UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel);
+    Task<bool> UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel);
+
+    Task<IEnumerable<CommentDto>> GetCommentsAssociatedWithTaskAsync(int taskId);
+
+    Task<bool> AddCommentToTaskAsync(int taskId, CommentInputModel inputModel);
+
+    Task<bool> RemoveCommentFromTaskAsync(int taskId, int commentId);
 }

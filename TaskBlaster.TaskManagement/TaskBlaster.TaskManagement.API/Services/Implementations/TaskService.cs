@@ -52,8 +52,23 @@ public class TaskService : ITaskService
         return await _taskRepository.UpdateTaskStatusAsync(taskId, inputModel);
     }
 
-    public Task UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel)
+    public async Task<bool> UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel)
     {
-        throw new NotImplementedException();
+        return await _taskRepository.UpdateTaskPriorityAsync(taskId, inputModel);
+    }
+
+    public async Task<IEnumerable<CommentDto>> GetCommentsAssociatedWithTaskAsync(int taskId)
+    {
+        return await _taskRepository.GetCommentsAssociatedWithTaskAsync(taskId);
+    }
+
+    public async Task<bool> AddCommentToTaskAsync(int taskId, CommentInputModel inputModel)
+    {
+        return await _taskRepository.AddCommentToTaskAsync(taskId, inputModel);
+    }
+
+    public async Task<bool> RemoveCommentFromTaskAsync(int taskId, int commentId)
+    {
+        return await _taskRepository.RemoveCommentFromTaskAsync(taskId, commentId);
     }
 }

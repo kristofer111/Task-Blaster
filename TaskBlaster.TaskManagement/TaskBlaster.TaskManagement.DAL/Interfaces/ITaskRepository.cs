@@ -20,7 +20,15 @@ public interface ITaskRepository
 
     Task<bool> UpdateTaskStatusAsync(int taskId, StatusInputModel inputModel);
 
-    Task UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel);
     Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications();
+    
+    Task<bool> UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel);
+    
     Task UpdateTaskNotifications();
+
+    Task<IEnumerable<CommentDto>> GetCommentsAssociatedWithTaskAsync(int taskId);
+
+    Task<bool> AddCommentToTaskAsync(int taskId, CommentInputModel inputModel);
+
+    Task<bool> RemoveCommentFromTaskAsync(int taskId, int commentId);
 }

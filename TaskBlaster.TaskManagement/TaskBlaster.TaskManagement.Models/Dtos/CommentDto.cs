@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace TaskBlaster.TaskManagement.Models.Dtos;
 
 public class CommentDto

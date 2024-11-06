@@ -16,7 +16,7 @@ namespace TaskBlaster.TaskManagement.API.Services.Implementations
         public string RetrieveUserEmailClaim()
         {
             var authUser = _httpContextAccessor.HttpContext?.User;
-            return authUser?.Claims.FirstOrDefault(c => c.Type == $"{Namespace}email")?.Value ?? "null";
+            return authUser?.Claims.FirstOrDefault(c => c.Type == $"{Namespace}email")?.Value ?? "";
         }
     }
 }

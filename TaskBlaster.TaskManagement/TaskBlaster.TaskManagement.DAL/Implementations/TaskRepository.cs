@@ -19,6 +19,8 @@ public class TaskRepository : ITaskRepository
         _claimsUtility = claimsUtility;
     }
 
+    // add tags to tasks will not be implemented
+
 
     // Archives a task by id. Archiving can mean a few things, and
     // depends on your implementation but normally it means that it
@@ -164,7 +166,7 @@ public class TaskRepository : ITaskRepository
             Priority = task.Priority.Name,
             CreatedAt = task.CreatedAt,
             DueDate = task.DueDate,
-            CreatedBy = task.CreatedBy.FullName,
+            CreatedBy = task.CreatedBy?.FullName ?? "",
             AssignedToUser = task.AssignedTo?.FullName,
             Tags = task.Tags
                 .Select(tag => tag.Name)
@@ -194,18 +196,83 @@ public class TaskRepository : ITaskRepository
             return false;
         }
 
-        task.StatusId = inputModel.StatusId;
+        task.StatusId = status.Id;
+        await _taskManagementDbContext.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel)
+    {
+        var task = await _taskManagementDbContext.Tasks
+            .FirstOrDefaultAsync(t => t.Id == taskId);
+
+        var priority = await _taskManagementDbContext.Priorities
+            .FirstOrDefaultAsync(s => s.Id == inputModel.PriorityId);
+
+        if (task == null || priority == null)
+        {
+            return false;
+        }
+
+        task.PriorityId = priority.Id;
+        await _taskManagementDbContext.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<IEnumerable<CommentDto>> GetCommentsAssociatedWithTaskAsync(int taskId)
+    {
+        var comments = await _taskManagementDbContext.Comments
+            .Where(c => c.TaskId == taskId)
+            .ToListAsync();
+
+        return comments.Select(c => new CommentDto
+        {
+            Id = c.Id,
+            Author = c.Author,
+            ContentAsMarkdown = c.ContentAsMarkdown,
+            CreatedAt = c.CreatedDate
+        });
+    }    
+
+    public async Task<bool> AddCommentToTaskAsync(int taskId, CommentInputModel inputModel)
+    {
+        if (! await _taskManagementDbContext.Tasks.AnyAsync(t => t.Id == taskId))
+        {
+            return false;
+        }
+
+        var emailClaim = _claimsUtility.RetrieveUserEmailClaim();
+
+        await _taskManagementDbContext.Comments.AddAsync(new Entities.Comment{
+            Author = emailClaim,
+            ContentAsMarkdown = inputModel.ContentAsMarkdown,
+            CreatedDate = DateTime.UtcNow,
+            TaskId = taskId
+        });
+        await _taskManagementDbContext.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> RemoveCommentFromTaskAsync(int taskId, int commentId)
+    {
+        var comment = await _taskManagementDbContext.Comments
+            .FirstOrDefaultAsync(c => c.Id == commentId);
+
+        if (comment == null)
+        {
+            return false;
+        }
+
+        _taskManagementDbContext.Comments.Remove(comment);
         await _taskManagementDbContext.SaveChangesAsync();
 
         return true;
     }
 
     public Task UpdateTaskNotifications()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel)
     {
         throw new NotImplementedException();
     }

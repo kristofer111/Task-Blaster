@@ -18,7 +18,7 @@ public class TasksController : ControllerBase
     {
         _taskService = taskService;
     }
-
+    
 
     /// <summary>
     /// Returns all tasks by a provided criteria as a paginated result
@@ -29,7 +29,7 @@ public class TasksController : ControllerBase
     public async Task<ActionResult<Envelope<TaskDto>>> GetPaginatedTasksByCriteria([FromQuery] TaskCriteriaQueryParams query)
     {
         var tasks = await _taskService.GetPaginatedTasksByCriteriaAsync(query);
-        return tasks;
+        return Ok(tasks);
     }
 
     /// <summary>
@@ -64,7 +64,7 @@ public class TasksController : ControllerBase
             return BadRequest(new { message = "Task could not be created because the token is missing required claims" });
         }
 
-        return Ok(newId);
+        return CreatedAtRoute("GetTaskById", new { taskId = newId }, null);
     }
 
     /// <summary>
@@ -144,9 +144,16 @@ public class TasksController : ControllerBase
     /// <param name="taskId">The id of the task</param>
     /// <param name="inputModel">The input model associated with the priority update</param>
     [HttpPatch("{taskId}/priority")]
-    public Task<ActionResult> UpdateTaskPriority(int taskId, [FromBody] PriorityInputModel inputModel)
+    public async Task<ActionResult> UpdateTaskPriority(int taskId, [FromBody] PriorityInputModel inputModel)
     {
-        throw new NotImplementedException();
+        var success = await _taskService.UpdateTaskPriorityAsync(taskId, inputModel);
+
+        if (!success)
+        {
+            return NotFound(new { message = $"Either task or priority was not found" });
+        }
+
+        return Ok();
     }
 
     /// <summary>
@@ -155,9 +162,10 @@ public class TasksController : ControllerBase
     /// <param name="taskId">The id of the task</param>
     /// <returns>A list of comments</returns>
     [HttpGet("{taskId}/comments")]
-    public Task<ActionResult> GetCommentsAssociatedWithTask(int taskId)
+    public async Task<ActionResult> GetCommentsAssociatedWithTask(int taskId)
     {
-        throw new NotImplementedException();
+        var comments = await _taskService.GetCommentsAssociatedWithTaskAsync(taskId);
+        return Ok(comments);
     }
 
     /// <summary>
@@ -166,9 +174,16 @@ public class TasksController : ControllerBase
     /// <param name="taskId">The id of the task</param>
     /// <param name="inputModel">The input model for the comment</param>
     [HttpPost("{taskId}/comments")]
-    public Task<ActionResult> AddCommentToTask(int taskId, [FromBody] CommentInputModel inputModel)
+    public async Task<ActionResult> AddCommentToTask(int taskId, [FromBody] CommentInputModel inputModel)
     {
-        throw new NotImplementedException();
+        var success = await _taskService.AddCommentToTaskAsync(taskId, inputModel);
+
+        if (!success)
+        {
+            return NotFound(new { message = $"Task with id {taskId} was not found" });
+        }
+
+        return Ok();
     }
 
     /// <summary>
@@ -177,8 +192,15 @@ public class TasksController : ControllerBase
     /// <param name="taskId">The id of the task</param>
     /// <param name="commentId">The id of the comment</param>
     [HttpDelete("{taskId}/comments/{commentId}")]
-    public Task<ActionResult> RemoveCommentFromTask(int taskId, int commentId)
+    public async Task<ActionResult> RemoveCommentFromTask(int taskId, int commentId)
     {
-        throw new NotImplementedException();
+        var success = await _taskService.RemoveCommentFromTaskAsync(taskId, commentId);
+
+        if (!success)
+        {
+            return NotFound(new { message = $"Comment with id {commentId} was not found" });
+        }
+
+        return Ok();
     }
 }
