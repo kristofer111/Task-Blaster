@@ -19,12 +19,65 @@ public class TaskRepository : ITaskRepository
         _claimsUtility = claimsUtility;
     }
 
-    public Task ArchiveTaskByIdAsync(int taskId)
+
+    // Archives a task by id. Archiving can mean a few things, and
+    // depends on your implementation but normally it means that it
+    // should not be removed entirely from the database
+    public async Task<bool> ArchiveTaskByIdAsync(int taskId)
     {
-        throw new NotImplementedException();
+        var task = await _taskManagementDbContext.Tasks
+            .FirstOrDefaultAsync(t => t.Id == taskId);
+
+        if (task == null)
+        {
+            return false;
+        }
+
+        task.IsArchived = true;
+        await _taskManagementDbContext.SaveChangesAsync();
+
+        return true;
     }
 
-    public Task AssignUserToTaskAsync(int taskId, int userId)
+    public async Task<bool> AssignUserToTaskAsync(int taskId, int userId)
+    {
+        var task = await _taskManagementDbContext.Tasks
+            .FirstOrDefaultAsync(t => t.Id == taskId);
+
+        var user = await _taskManagementDbContext.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (task == null || user == null)
+        {
+            return false;
+        }
+
+        task.AssignedToId = user.Id;
+        await _taskManagementDbContext.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> UnassignUserFromTaskAsync(int taskId, int userId)
+    {
+        var task = await _taskManagementDbContext.Tasks
+            .FirstOrDefaultAsync(t => t.Id == taskId);
+
+        var user = await _taskManagementDbContext.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (task == null || user == null)
+        {
+            return false;
+        }
+
+        task.AssignedToId = null;
+        await _taskManagementDbContext.SaveChangesAsync();
+
+        return true;
+    }
+
+    public Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
     {
         throw new NotImplementedException();
     }
@@ -64,9 +117,27 @@ public class TaskRepository : ITaskRepository
         return newTask.Id;
     }
 
-    public Task<Envelope<TaskDto>> GetPaginatedTasksByCriteriaAsync(TaskCriteriaQueryParams query)
+    // Gets a paginated and filtered list of tasks. The tasks should be
+    // filtered using the provided filtering object
+    // pageSize
+    // pageNumber
+    // searchValue
+    public async Task<Envelope<TaskDto>> GetPaginatedTasksByCriteriaAsync(TaskCriteriaQueryParams query)
     {
-        throw new NotImplementedException();
+        var tasks = await _taskManagementDbContext.Tasks
+            .Where(t => t.Title.Contains(query.SearchValue) ||
+                t.Description.Contains(query.SearchValue))
+            .Select(t => new TaskDto
+            {
+                Id = t.Id,
+                Title = t.Title,
+                Status = t.Status.Name,
+                DueDate = t.DueDate,
+                AssignedToUser = t.AssignedTo.FullName
+            }).ToListAsync();
+
+        Envelope<TaskDto> envelope = new(query.PageNumber, query.PageSize, tasks);
+        return envelope;
     }
 
     public async Task<TaskDetailsDto?> GetTaskByIdAsync(int taskId)
@@ -94,7 +165,7 @@ public class TaskRepository : ITaskRepository
             CreatedAt = task.CreatedAt,
             DueDate = task.DueDate,
             CreatedBy = task.CreatedBy.FullName,
-            AssignedToUser = task.AssignedTo.FullName,
+            AssignedToUser = task.AssignedTo?.FullName,
             Tags = task.Tags
                 .Select(tag => tag.Name)
                 .ToList(),
@@ -110,14 +181,23 @@ public class TaskRepository : ITaskRepository
         };
     }
 
-    public Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
+    public async Task<bool> UpdateTaskStatusAsync(int taskId, StatusInputModel inputModel)
     {
-        throw new NotImplementedException();
-    }
+        var task = await _taskManagementDbContext.Tasks
+            .FirstOrDefaultAsync(t => t.Id == taskId);
 
-    public Task UnassignUserFromTaskAsync(int taskId, int userId)
-    {
-        throw new NotImplementedException();
+        var status = await _taskManagementDbContext.Statuses
+            .FirstOrDefaultAsync(s => s.Id == inputModel.StatusId);
+
+        if (task == null || status == null)
+        {
+            return false;
+        }
+
+        task.StatusId = inputModel.StatusId;
+        await _taskManagementDbContext.SaveChangesAsync();
+
+        return true;
     }
 
     public Task UpdateTaskNotifications()
@@ -126,11 +206,6 @@ public class TaskRepository : ITaskRepository
     }
 
     public Task UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task UpdateTaskStatusAsync(int taskId, StatusInputModel inputModel)
     {
         throw new NotImplementedException();
     }

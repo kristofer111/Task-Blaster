@@ -16,9 +16,9 @@ public class TaskService : ITaskService
     }
 
 
-    public Task<Envelope<TaskDto>> GetPaginatedTasksByCriteriaAsync(TaskCriteriaQueryParams query)
+    public async Task<Envelope<TaskDto>> GetPaginatedTasksByCriteriaAsync(TaskCriteriaQueryParams query)
     {
-        throw new NotImplementedException();
+        return await _taskRepository.GetPaginatedTasksByCriteriaAsync(query);
     }
 
     public async Task<TaskDetailsDto?> GetTaskByIdAsync(int taskId)
@@ -32,24 +32,24 @@ public class TaskService : ITaskService
         return await _taskRepository.CreateNewTaskAsync(task);
     }
 
-    public Task ArchiveTaskByIdAsync(int taskId)
+    public async Task<bool> ArchiveTaskByIdAsync(int taskId)
     {
-        throw new NotImplementedException();
+        return await _taskRepository.ArchiveTaskByIdAsync(taskId);
     }
 
-    public Task AssignUserToTaskAsync(int taskId, int userId)
+    public async Task<bool> AssignUserToTaskAsync(int taskId, int userId)
     {
-        throw new NotImplementedException();
+        return await _taskRepository.AssignUserToTaskAsync(taskId, userId);
     }
 
-    public Task UnassignUserFromTaskAsync(int taskId, int userId)
+    public async Task<bool> UnassignUserFromTaskAsync(int taskId, int userId)
     {
-        throw new NotImplementedException();
+        return await _taskRepository.UnassignUserFromTaskAsync(taskId, userId);
     }
 
-    public Task UpdateTaskStatusAsync(int taskId, StatusInputModel inputModel)
+    public async Task<bool> UpdateTaskStatusAsync(int taskId, StatusInputModel inputModel)
     {
-        throw new NotImplementedException();
+        return await _taskRepository.UpdateTaskStatusAsync(taskId, inputModel);
     }
 
     public Task UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel)

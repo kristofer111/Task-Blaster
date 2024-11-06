@@ -13,7 +13,7 @@ namespace TaskBlaster.TaskManagement.API.Controllers;
 public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
-    
+
     public TasksController(ITaskService taskService)
     {
         _taskService = taskService;
@@ -26,9 +26,10 @@ public class TasksController : ControllerBase
     /// <param name="query">A query which is used to paginate and filter the result</param>
     /// <returns>A filtered and paginated list of tasks</returns>
     [HttpGet("")]
-    public Task<ActionResult<Envelope<TaskDto>>> GetPaginatedTasksByCriteria([FromQuery] TaskCriteriaQueryParams query)
+    public async Task<ActionResult<Envelope<TaskDto>>> GetPaginatedTasksByCriteria([FromQuery] TaskCriteriaQueryParams query)
     {
-        throw new NotImplementedException();
+        var tasks = await _taskService.GetPaginatedTasksByCriteriaAsync(query);
+        return tasks;
     }
 
     /// <summary>
@@ -71,9 +72,16 @@ public class TasksController : ControllerBase
     /// </summary>
     /// <param name="taskId">The id of the task which should be archived</param>
     [HttpDelete("{taskId}")]
-    public Task<ActionResult> ArchiveTaskById(int taskId)
+    public async Task<ActionResult> ArchiveTaskById(int taskId)
     {
-        throw new NotImplementedException();
+        var success = await _taskService.ArchiveTaskByIdAsync(taskId);
+
+        if (!success)
+        {
+            return NotFound(new { message = $"Task with id {taskId} was not found" });
+        }
+
+        return Ok();
     }
 
     /// <summary>
@@ -82,9 +90,16 @@ public class TasksController : ControllerBase
     /// <param name="taskId">The id of the task</param>
     /// <param name="userId">The id of the user which should be assigned</param>
     [HttpPatch("{taskId}/assign/{userId}")]
-    public Task<ActionResult> AssignUserToTask(int taskId, int userId)
+    public async Task<ActionResult> AssignUserToTask(int taskId, int userId)
     {
-        throw new NotImplementedException();
+        var success = await _taskService.AssignUserToTaskAsync(taskId, userId);
+
+        if (!success)
+        {
+            return NotFound(new { message = $"Either task or user was not found" });
+        }
+
+        return Ok();
     }
 
     /// <summary>
@@ -93,9 +108,16 @@ public class TasksController : ControllerBase
     /// <param name="taskId">The id of the task</param>
     /// <param name="userId">The id of the user which should be unassigned</param>
     [HttpPatch("{taskId}/unassign/{userId}")]
-    public Task<ActionResult> UnassignUserFromTask(int taskId, int userId)
+    public async Task<ActionResult> UnassignUserFromTask(int taskId, int userId)
     {
-        throw new NotImplementedException();
+        var success = await _taskService.UnassignUserFromTaskAsync(taskId, userId);
+
+        if (!success)
+        {
+            return NotFound(new { message = $"Either task or user was not found" });
+        }
+
+        return Ok();
     }
 
     /// <summary>
@@ -104,9 +126,16 @@ public class TasksController : ControllerBase
     /// <param name="taskId">The id of the task</param>
     /// <param name="inputModel">The input model associated with the status update</param>
     [HttpPatch("{taskId}/status")]
-    public Task<ActionResult> UpdateTaskStatus(int taskId, [FromBody] StatusInputModel inputModel)
+    public async Task<ActionResult> UpdateTaskStatus(int taskId, [FromBody] StatusInputModel inputModel)
     {
-        throw new NotImplementedException();
+        var success = await _taskService.UpdateTaskStatusAsync(taskId, inputModel);
+
+        if (!success)
+        {
+            return NotFound(new { message = $"Either task or status was not found" });
+        }
+
+        return Ok();
     }
 
     /// <summary>

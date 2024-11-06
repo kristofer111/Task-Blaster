@@ -12,13 +12,13 @@ public interface ITaskRepository
 
     Task<int?> CreateNewTaskAsync(TaskInputModel task);
 
-    Task ArchiveTaskByIdAsync(int taskId);
+    Task<bool> ArchiveTaskByIdAsync(int taskId);
 
-    Task AssignUserToTaskAsync(int taskId, int userId);
+    Task<bool> AssignUserToTaskAsync(int taskId, int userId);
 
-    Task UnassignUserFromTaskAsync(int taskId, int userId);
+    Task<bool> UnassignUserFromTaskAsync(int taskId, int userId);
 
-    Task UpdateTaskStatusAsync(int taskId, StatusInputModel inputModel);
+    Task<bool> UpdateTaskStatusAsync(int taskId, StatusInputModel inputModel);
 
     Task UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel);
     Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications();

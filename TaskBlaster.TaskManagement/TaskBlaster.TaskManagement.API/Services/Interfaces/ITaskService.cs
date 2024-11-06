@@ -30,28 +30,28 @@ public interface ITaskService
     /// Archives a task by id
     /// </summary>
     /// <param name="taskId">The id of the task which should be archived</param>
-    Task ArchiveTaskByIdAsync(int taskId);
+    Task<bool> ArchiveTaskByIdAsync(int taskId);
 
     /// <summary>
     /// Assigns a user from a task, and notifies the user via email
     /// </summary>
     /// <param name="taskId">The id of the task</param>
     /// <param name="userId">The id of the user</param>
-    Task AssignUserToTaskAsync(int taskId, int userId);
+    Task<bool> AssignUserToTaskAsync(int taskId, int userId);
 
     /// <summary>
     /// Unassigns a user from a task, and notifies the user via email
     /// </summary>
     /// <param name="taskId">The id of the task</param>
     /// <param name="userId">The id of the user</param>
-    Task UnassignUserFromTaskAsync(int taskId, int userId);
+    Task<bool> UnassignUserFromTaskAsync(int taskId, int userId);
 
     /// <summary>
     /// Updates the status of a task, e.g. 'pending', 'completed'
     /// </summary>
     /// <param name="taskId">The id of the task</param>
     /// <param name="inputModel">The input model associated with the status update</param>
-    Task UpdateTaskStatusAsync(int taskId, StatusInputModel inputModel);
+    Task<bool> UpdateTaskStatusAsync(int taskId, StatusInputModel inputModel);
 
     /// <summary>
     /// Updates the priority of a task, e.g. 'Critical', 'High'
