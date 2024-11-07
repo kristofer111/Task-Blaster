@@ -1,15 +1,23 @@
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using TaskBlaster.TaskManagement.DAL.Implementations;
+using TaskBlaster.TaskManagement.DAL.Interfaces;
+using TaskBlaster.TaskManagement.Notifications.Models;
 using TaskBlaster.TaskManagement.Notifications.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddTransient<ITaskRepository, TaskRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var serviceIpOptions = new ServiceIpOptions();
+builder.Configuration.GetSection("ServiceIp").Bind(serviceIpOptions);
+builder.Services.AddSingleton(serviceIpOptions);
 
 builder.Services.AddAuthentication(options =>
 {

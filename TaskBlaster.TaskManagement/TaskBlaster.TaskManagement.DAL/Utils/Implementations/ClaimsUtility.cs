@@ -18,5 +18,10 @@ namespace TaskBlaster.TaskManagement.API.Services.Implementations
             var authUser = _httpContextAccessor.HttpContext?.User;
             return authUser?.Claims.FirstOrDefault(c => c.Type == $"{Audience}email")?.Value ?? "";
         }
+        public string RetrieveUserNameClaim()
+        {
+            var authUser = _httpContextAccessor.HttpContext?.User;
+            return authUser?.Claims.FirstOrDefault(c => c.Type == $"{Audience}name")?.Value ?? "";
+        }
     }
 }

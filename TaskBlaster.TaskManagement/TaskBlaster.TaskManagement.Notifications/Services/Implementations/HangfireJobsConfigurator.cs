@@ -15,7 +15,7 @@ namespace TaskBlaster.TaskManagement.Notifications.Services.Implementations
         public static void ConfigureRecurringJobs()
         {
             RecurringJob.AddOrUpdate<TaskService>(
-                "GetTasksForNotificationsEvery30Minutes", // Job ID
+                "SendDueDateReminder", // Job ID
                 taskService => taskService.GetTasksForNotifications(), // Method to call
                 "*/1 * * * *" // CRON expression for every 30 minutes
             );
