@@ -6,6 +6,7 @@ using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Models.InputModels;
 using Task = System.Threading.Tasks.Task;
 using TaskBlaster.TaskManagement.API.Services.Interfaces;
+using TaskBlaster.TaskManagement.DAL.Entities;
 
 namespace TaskBlaster.TaskManagement.DAL.Implementations;
 
@@ -79,11 +80,6 @@ public class TaskRepository : ITaskRepository
         return true;
     }
 
-    public Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<int?> CreateNewTaskAsync(TaskInputModel task)
     {
         var assignedToUser = await _taskManagementDbContext.Users
@@ -144,6 +140,7 @@ public class TaskRepository : ITaskRepository
 
     public async Task<TaskDetailsDto?> GetTaskByIdAsync(int taskId)
     {
+        Console.WriteLine($"DateTime.UtcNow: {DateTime.UtcNow}");
         var task = await _taskManagementDbContext.Tasks
             .Include(t => t.Status)
             .Include(t => t.Priority)
@@ -234,18 +231,19 @@ public class TaskRepository : ITaskRepository
             ContentAsMarkdown = c.ContentAsMarkdown,
             CreatedAt = c.CreatedDate
         });
-    }    
+    }
 
     public async Task<bool> AddCommentToTaskAsync(int taskId, CommentInputModel inputModel)
     {
-        if (! await _taskManagementDbContext.Tasks.AnyAsync(t => t.Id == taskId))
+        if (!await _taskManagementDbContext.Tasks.AnyAsync(t => t.Id == taskId))
         {
             return false;
         }
 
         var emailClaim = _claimsUtility.RetrieveUserEmailClaim();
 
-        await _taskManagementDbContext.Comments.AddAsync(new Entities.Comment{
+        await _taskManagementDbContext.Comments.AddAsync(new Comment
+        {
             Author = emailClaim,
             ContentAsMarkdown = inputModel.ContentAsMarkdown,
             CreatedDate = DateTime.UtcNow,
@@ -272,6 +270,41 @@ public class TaskRepository : ITaskRepository
         return true;
     }
 
+    // Get all tasks which have not been notified and are due. This is
+    // used by the background processing service to retrieve a list of
+    // tasks which should be notified because the tasks are due for
+    // completion
+    public async Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
+    {
+        var task = await _taskManagementDbContext.Tasks
+            .Include(t => t.Notification)
+            .Include(t => t.Status)
+            .Where(t => t.DueDate < DateTime.UtcNow &&
+                t.Notification.DueDateNotificationSent == false &&
+                t.Notification.DayAfterNotificationSent == false)
+            .ToListAsync();
+
+        return task.Select(t => new TaskWithNotificationDto
+        {
+            Id = t.Id,
+            Title = t.Title,
+            Status = t.Status.Name,
+            DueDate = t.DueDate,
+            Notification = new TaskNotificationDto
+            {
+                Id = t.Notification.Id,
+                TaskId = t.Id,
+                DueDateNotificationSent = t.Notification.DueDateNotificationSent,
+                DayAfterNotificationSent = t.Notification.DayAfterNotificationSent,
+                LastNotificationDate = t.Notification.LastNotificationDate
+            }
+        });
+    }
+
+    // Updates the status of the task notifications, after the emails have
+    // been sent. To ensure the emails will not be sent during the next
+    // process, each process is executed every 30 minutes, the
+    // notifications should be marked as completed
     public Task UpdateTaskNotifications()
     {
         throw new NotImplementedException();

@@ -18,7 +18,7 @@ public class TasksController : ControllerBase
     {
         _taskService = taskService;
     }
-    
+
 
     /// <summary>
     /// Returns all tasks by a provided criteria as a paginated result
@@ -202,5 +202,13 @@ public class TasksController : ControllerBase
         }
 
         return Ok();
+    }
+
+    // test function
+    [HttpGet("notifications")]
+    public async Task<ActionResult<IEnumerable<TaskWithNotificationDto>>> GetTasksForNotifications()
+    {
+        var res = await _taskService.GetTasksForNotifications();
+        return Ok(res);
     }
 }

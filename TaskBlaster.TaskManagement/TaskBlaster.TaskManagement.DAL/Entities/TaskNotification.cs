@@ -7,8 +7,7 @@ public class TaskNotification
 {
     [Key]
     public int Id { get; set; }
-    [ForeignKey("Task")]
-    public int TaskId { get; set; }
+    [ForeignKey("Task")] public int TaskId { get; set; }
     public Task Task { get; set; } = null!;
     [Required]
     public bool DueDateNotificationSent { get; set; }

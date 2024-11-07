@@ -65,4 +65,7 @@ public interface ITaskService
     Task<bool> AddCommentToTaskAsync(int taskId, CommentInputModel inputModel);
 
     Task<bool> RemoveCommentFromTaskAsync(int taskId, int commentId);
+
+
+    Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications();
 }

@@ -9,12 +9,26 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=TaskBlaster
-    # volumes:
-    #   - postgres_data:/var/lib/postgresql/data
+    volumes:
+      - task-blaster-data:/var/lib/postgresql/data
     networks:
       - task-blaster-network
 
-  task-management:
+  hangfire-db:
+    image: postgres:latest
+    container_name: hangfire-db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=Hangfire
+    volumes:
+      - hangfire-data:/var/lib/postgresql/data
+    networks:
+      - task-blaster-network
+
+  task-management-api:
     build:
       context: ./TaskBlaster.TaskManagement
       dockerfile: Dockerfile
@@ -31,3 +45,7 @@ services:
 networks:
   task-blaster-network:
     driver: bridge
+
+volumes:
+  task-blaster-data:
+  hangfire-data:

@@ -23,4 +23,5 @@ public class Task
     public User CreatedBy { get; set; }
     public bool IsArchived { get; set; } = false;
     public ICollection<Tag> Tags { get; set; } = new List<Tag>();
+    public TaskNotification Notification { get; set; }
 }

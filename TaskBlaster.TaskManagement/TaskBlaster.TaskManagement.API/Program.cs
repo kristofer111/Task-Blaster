@@ -9,7 +9,7 @@ using TaskBlaster.TaskManagement.DAL.Implementations;
 using TaskBlaster.TaskManagement.DAL.Interfaces;
 using TaskBlaster.TaskManagement.Models.InputModels;
 
-const string Namespace = "https://task-management-web-api.com";
+const string Audience = "https://task-management-web-api.com";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,8 +56,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     return;
                 }
 
-                var emailClaim = user.FindFirst(ClaimTypes.Email)?.Value ?? user.FindFirst($"{Namespace}email")?.Value;
-                var nameClaim = user.FindFirst(ClaimTypes.Name)?.Value ?? user.FindFirst($"{Namespace}name")?.Value;
+                var emailClaim = user.FindFirst(ClaimTypes.Email)?.Value ?? user.FindFirst($"{Audience}email")?.Value;
+                var nameClaim = user.FindFirst(ClaimTypes.Name)?.Value ?? user.FindFirst($"{Audience}name")?.Value;
 
                 var pictureClaim = user.FindFirst("picture")?.Value;
                 var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
@@ -82,7 +82,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Error creating/updating user with Email: {EmailClaim}, Name: {NameClaim} from token", 
+                    logger.LogError(ex, "Error creating/updating user with Email: {EmailClaim}, Name: {NameClaim} from token",
                         emailClaim, nameClaim);
                 }
             }

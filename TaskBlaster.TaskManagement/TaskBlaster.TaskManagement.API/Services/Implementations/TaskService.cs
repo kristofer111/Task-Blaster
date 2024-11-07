@@ -71,4 +71,10 @@ public class TaskService : ITaskService
     {
         return await _taskRepository.RemoveCommentFromTaskAsync(taskId, commentId);
     }
+
+    // test function
+    public Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
+    {
+        return _taskRepository.GetTasksForNotifications();
+    }
 }

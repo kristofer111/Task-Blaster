@@ -6,7 +6,7 @@ namespace TaskBlaster.TaskManagement.API.Services.Implementations
     public class ClamsUtility : IClaimsUtility
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private const string Namespace = "https://task-management-web-api.com";
+        private const string Audience = "https://task-management-web-api.com";
 
         public ClamsUtility(IHttpContextAccessor httpContextAccessor)
         {
@@ -16,7 +16,7 @@ namespace TaskBlaster.TaskManagement.API.Services.Implementations
         public string RetrieveUserEmailClaim()
         {
             var authUser = _httpContextAccessor.HttpContext?.User;
-            return authUser?.Claims.FirstOrDefault(c => c.Type == $"{Namespace}email")?.Value ?? "";
+            return authUser?.Claims.FirstOrDefault(c => c.Type == $"{Audience}email")?.Value ?? "";
         }
     }
 }
