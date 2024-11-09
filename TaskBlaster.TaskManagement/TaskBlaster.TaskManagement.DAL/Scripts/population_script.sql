@@ -37,7 +37,7 @@ INSERT INTO "public"."Users" ("FullName" , "EmailAddress", "ProfileImageUrl", "C
 ('Grace Taylor', 'grace.taylor@example.com', 'https://example.com/images/grace.jpg', '2023-10-06 14:00:00'),
 ('Henry Wilson', 'henry.wilson@example.com', 'https://example.com/images/henry.jpg', '2023-10-07 15:45:00'),
 ('Isabella Moore', 'isabella.moore@example.com', 'https://example.com/images/isabella.jpg', '2023-10-08 16:30:00'),
-('Jack Anderson', 'jack.anderson@example.com', 'https://example.com/images/jack.jpg', '2023-10-09 17:15:00');
+('Kristófer Svavarsson', 'kristoferorri1@gmail.com', 'https://example.com/images/jack.jpg', '2023-10-09 17:15:00');
 
 INSERT INTO "public"."Tasks" ("Title", "Description", "CreatedAt", "DueDate", "PriorityId", "StatusId", "AssignedToId", "CreatedById", "IsArchived") VALUES
 ('Setup Project Repository', 'Initialize and set up the project repository with appropriate branches and permissions.', '2023-10-01 08:00:00', '2023-10-05 18:00:00', 1, 2, 1, 1, false),
@@ -88,13 +88,13 @@ INSERT INTO "public"."TagTask" ("TagsId", "TasksId") VALUES
 (10, 1); -- Research for 'Setup Project Repository'
 
 INSERT INTO "public"."TaskNotifications" ("TaskId", "DueDateNotificationSent", "DayAfterNotificationSent", "LastNotificationDate") VALUES
-(1, FALSE, FALSE, NULL),   				   -- Task 1: No notifications sent
+(1, TRUE, FALSE, NULL),   				   -- Task 1: No notifications sent
 (2, TRUE, TRUE, '2023-10-09 18:00:00'),    -- Task 2: Notifications sent on due date and day after
-(3, FALSE, FALSE, '2023-10-11 17:00:00'),   -- Task 3: No notifications sent
+(3, TRUE, FALSE, '2023-10-11 17:00:00'),   -- Task 3: No notifications sent
 (4, TRUE, FALSE, '2023-10-12 18:00:00'),   -- Task 4: Notification sent only on due date
 (5, TRUE, TRUE, '2023-10-16 18:00:00'),    -- Task 5: Notifications sent on both due date and day after
 (6, TRUE, FALSE, '2023-10-16 17:00:00'),   -- Task 6: Notification sent on due date only
 (7, TRUE, TRUE, '2023-10-19 18:00:00'),    -- Task 7: Notifications sent on both due date and day after
-(8, FALSE, FALSE, '2023-10-21 17:00:00'),   -- Task 8: No notifications sent
+(8, TRUE, FALSE, '2023-10-21 17:00:00'),   -- Task 8: No notifications sent
 (9, TRUE, FALSE, '2023-10-22 18:00:00'),   -- Task 9: Notification sent only on due date
-(10, TRUE, TRUE, '2023-10-26 17:00:00');   -- Task 10: Notifications sent on both due date and day after
+(10, FALSE, FALSE, '2023-10-26 17:00:00');   -- Task 10: Notifications sent on both due date and day after
