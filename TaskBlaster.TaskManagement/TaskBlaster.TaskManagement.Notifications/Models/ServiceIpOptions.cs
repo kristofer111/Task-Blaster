@@ -8,6 +8,11 @@ namespace TaskBlaster.TaskManagement.Notifications.Models
         /// <summary>
         /// Gets or sets the IP address for the TaskManagement service.
         /// </summary>
-        public string TaskManagement { get; set; }
+        public string TaskManagement { get; set; } = null!;
+
+        /// <summary>
+        /// Gets or sets the IP address for the Mailjet service.
+        /// </summary>
+        public string Mailjet { get; set; } = null!;
     }
 }

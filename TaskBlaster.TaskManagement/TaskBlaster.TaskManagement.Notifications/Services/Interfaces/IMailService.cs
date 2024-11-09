@@ -11,8 +11,8 @@ public interface IMailService
     /// <param name="subject">The subject of the email</param>
     /// <param name="content">The content of the email</param>
     /// <param name="contentType">The content type of the email (HTML, Text)</param>
-    Task SendBasicEmailAsync(string to, string subject, string content, EmailContentType contentType);
-    
+    Task<bool> SendBasicEmailAsync(BasicEmailInputModel basicEmail, EmailContentType contentType);
+
     /// <summary>
     /// Sends a templated email with a mail service (optional)
     /// </summary>

@@ -8,4 +8,5 @@ public class TaskWithNotificationDto
     public DateTime? DueDate { get; set; }
     public string? AssignedToUser { get; set; }
     public TaskNotificationDto Notification { get; set; } = null!;
+    public UserDto AssignedTo { get; set; } = null!;
 }

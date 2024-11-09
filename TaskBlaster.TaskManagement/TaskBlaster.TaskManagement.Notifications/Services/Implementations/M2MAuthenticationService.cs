@@ -21,10 +21,10 @@ namespace TaskBlaster.TaskManagement.Notifications.Services.Implementations
             _authority = configuration.GetValue<string>("Auth0:Authority") ?? throw new ArgumentNullException("Auth0:Authority");
             _clientId = configuration.GetValue<string>("Auth0:ClientId") ?? throw new ArgumentNullException("Auth0:ClientId");
             _clientSecret = configuration.GetValue<string>("Auth0:ClientSecret") ?? throw new ArgumentNullException("Auth0:ClientSecret");
-            _httpClient.BaseAddress = new Uri($"{_authority}oauth/token");
+            _httpClient.BaseAddress = new Uri($"{_authority}/oauth/token");
         }
 
-        public Task<string> RetrieveAccessToken(string audience)
+        public async Task<string> RetrieveAccessToken(string audience)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, _httpClient.BaseAddress)
             {
@@ -40,7 +40,8 @@ namespace TaskBlaster.TaskManagement.Notifications.Services.Implementations
             var response = _httpClient.SendAsync(request).Result;
             var jsonPart = response.Content.ReadAsStringAsync();
             var authResponse = JsonSerializer.Deserialize<AuthResponse>(jsonPart.Result);
-            return Task.FromResult(authResponse?.access_token ?? "null");
+            var accessToken = await Task.FromResult(authResponse?.access_token ?? "null");
+            return accessToken;
         }
     }
 }

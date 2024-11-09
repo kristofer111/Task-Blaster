@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Gateway.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using TaskBlaster.TaskManagement.API.Services;
@@ -27,6 +28,7 @@ builder.Services.AddTransient<ITagService, TagService>();
 
 builder.Services.AddTransient<IClaimsUtility, ClamsUtility>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddTransient<IM2MAuthenticationService, M2MAuthenticationService>();
 
 
 builder.Services.AddDbContext<TaskManagementDbContext>(options =>

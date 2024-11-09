@@ -173,6 +173,8 @@ public class TasksController : ControllerBase
     /// </summary>
     /// <param name="taskId">The id of the task</param>
     /// <param name="inputModel">The input model for the comment</param>
+    /// 
+    // TODO add author to task
     [HttpPost("{taskId}/comments")]
     public async Task<ActionResult> AddCommentToTask(int taskId, [FromBody] CommentInputModel inputModel)
     {
@@ -204,11 +206,11 @@ public class TasksController : ControllerBase
         return Ok();
     }
 
-    // test function
-    [HttpGet("notifications")]
+    // GetTasksForNotifications
+    [HttpGet("notifications/tasks")]
     public async Task<ActionResult<IEnumerable<TaskWithNotificationDto>>> GetTasksForNotifications()
     {
-        var res = await _taskService.GetTasksForNotifications();
-        return Ok(res);
+        var tasks = await _taskService.GetTasksForNotifications();
+        return Ok(tasks);
     }
 }

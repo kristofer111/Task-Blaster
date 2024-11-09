@@ -218,6 +218,7 @@ public class TaskRepository : ITaskRepository
         return true;
     }
 
+    // TODO: Move to Comment Repository
     public async Task<IEnumerable<CommentDto>> GetCommentsAssociatedWithTaskAsync(int taskId)
     {
         var comments = await _taskManagementDbContext.Comments
@@ -233,6 +234,7 @@ public class TaskRepository : ITaskRepository
         });
     }
 
+    // TODO: Move to Comment Repository
     public async Task<bool> AddCommentToTaskAsync(int taskId, CommentInputModel inputModel)
     {
         if (!await _taskManagementDbContext.Tasks.AnyAsync(t => t.Id == taskId))
@@ -254,6 +256,7 @@ public class TaskRepository : ITaskRepository
         return true;
     }
 
+    // TODO: Move to Comment Repository
     public async Task<bool> RemoveCommentFromTaskAsync(int taskId, int commentId)
     {
         var comment = await _taskManagementDbContext.Comments
@@ -274,13 +277,19 @@ public class TaskRepository : ITaskRepository
     // used by the background processing service to retrieve a list of
     // tasks which should be notified because the tasks are due for
     // completion
+
+    // TODO:
+    // passa að user sé assigned
+    // ekki skila archived tasks
+    // add notification on task on creation
     public async Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
     {
         var task = await _taskManagementDbContext.Tasks
             .Include(t => t.Notification)
             .Include(t => t.Status)
+            .Include(t => t.AssignedTo)
             .Where(t => t.DueDate < DateTime.UtcNow &&
-                t.Notification.DueDateNotificationSent == false &&
+                t.Notification.DueDateNotificationSent == false ||
                 t.Notification.DayAfterNotificationSent == false)
             .ToListAsync();
 
@@ -290,6 +299,7 @@ public class TaskRepository : ITaskRepository
             Title = t.Title,
             Status = t.Status.Name,
             DueDate = t.DueDate,
+            AssignedToUser = t.AssignedTo.EmailAddress,
             Notification = new TaskNotificationDto
             {
                 Id = t.Notification.Id,
@@ -297,6 +307,13 @@ public class TaskRepository : ITaskRepository
                 DueDateNotificationSent = t.Notification.DueDateNotificationSent,
                 DayAfterNotificationSent = t.Notification.DayAfterNotificationSent,
                 LastNotificationDate = t.Notification.LastNotificationDate
+            },
+            AssignedTo = new UserDto
+            {
+                Id = t.AssignedTo.Id,
+                FullName = t.AssignedTo.FullName,
+                Email = t.AssignedTo.EmailAddress,
+                ProfileImageUrl = t.AssignedTo.ProfileImageUrl
             }
         });
     }
@@ -305,6 +322,11 @@ public class TaskRepository : ITaskRepository
     // been sent. To ensure the emails will not be sent during the next
     // process, each process is executed every 30 minutes, the
     // notifications should be marked as completed
+
+    // _dbcontext request sem sækir bara öll tasks sem eru 
+    // með due date í dag og í gær. (Og duedatenotification /dayafternotification = false)
+
+    // Date þarf að vera universal time
     public Task UpdateTaskNotifications()
     {
         throw new NotImplementedException();

@@ -1,4 +1,4 @@
-using TaskBlaster.TaskManagement.DAL.Interfaces;
+using System.Net.Http.Headers;
 using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Notifications.Models;
 using TaskBlaster.TaskManagement.Notifications.Services.Interfaces;
@@ -8,23 +8,42 @@ namespace TaskBlaster.TaskManagement.Notifications.Services.Implementations;
 public class TaskService : ITaskService
 {
     private readonly HttpClient _httpClient;
-    private readonly ITaskRepository _taskRepository;
+    private readonly IM2MAuthenticationService _m2MAuthenticationService;
+    private readonly IConfiguration _configuration;
 
-    public TaskService(HttpClient httpClient, IM2MAuthenticationService m2MAuthenticationService, IConfiguration configuration, ServiceIpOptions serviceIpOptions, ITaskRepository taskRepository)
+    public TaskService(HttpClient httpClient, IM2MAuthenticationService m2MAuthenticationService, IConfiguration configuration, ServiceIpOptions serviceIpOptions)
     {
-        _taskRepository = taskRepository;
         _httpClient = httpClient;
-        var token = m2MAuthenticationService.RetrieveAccessToken(configuration.GetValue<string>("Auth0:Audience"));
-        _httpClient.BaseAddress = new Uri($"{serviceIpOptions.TaskManagement}/api/orders/");
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        _m2MAuthenticationService = m2MAuthenticationService;
+        _configuration = configuration;
+
+        _httpClient.BaseAddress = new Uri($"{serviceIpOptions.TaskManagement}/tasks/notifications/tasks");
+        Console.WriteLine($"base address: {_httpClient.BaseAddress}");
     }
 
-
-    public Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
+    public async Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
     {
-        throw new NotImplementedException();
+        var audience = _configuration.GetValue<string>("Auth0:Audience") ?? throw new ArgumentNullException("Auth0:Audience");
+        var token = await _m2MAuthenticationService.RetrieveAccessToken(audience);
+
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "");
+        var response = await _httpClient.SendAsync(request);
+
+        response.EnsureSuccessStatusCode();
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Console.WriteLine($"Response content: {responseContent}");
+
+        var tasks = await response.Content.ReadFromJsonAsync<IEnumerable<TaskWithNotificationDto>>();
+        Console.WriteLine($"Tasks: {tasks}");
+
+        return tasks;
     }
 
+    // _dbcontext request sem sækir bara öll tasks sem eru með due date í dag og í gær. 
+    // (Og duedatenotification /dayafternotification = false)
     public Task UpdateTaskNotifications()
     {
         throw new NotImplementedException();
