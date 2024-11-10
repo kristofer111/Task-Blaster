@@ -1,4 +1,6 @@
-First, to create the databases and start the applications, run ``docker compose up -d`` in the root folder. If the 'notifications' container inexplicably stops running immediately after initialization, just press play again in Docker Desktop, or run ``docker compose up -d`` once more. 
+First, to create the databases and start the applications, run ``docker compose up -d`` in the root folder.
+
+If the 'notifications' container inexplicably stops running immediately after initialization, just press play again in Docker Desktop, or run ``docker compose up -d`` once more. 
 
 Next, to migrate the necessary tables to the database, navigate to the TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.API/ folder and run \
 ``dotnet tool install --global dotnet-ef`` (if necessary)
