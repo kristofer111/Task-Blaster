@@ -1,4 +1,4 @@
-First, to create the databases and start the applications, run ``docker compose up -d`` in the root folder. If the 'notifications' inexplicably stops running immediately after initialization, just press play again in Docker Desltop or run ``docker compose up -d`` once more. 
+First, to create the databases and start the applications, run ``docker compose up -d`` in the root folder. If the 'notifications' container inexplicably stops running immediately after initialization, just press play again in Docker Desktop, or run ``docker compose up -d`` once more. 
 
 Next, to migrate the necessary tables to the database, navigate to the TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.API/ folder and run \
 ``dotnet tool install --global dotnet-ef`` (if necessary)
@@ -6,7 +6,7 @@ Next, to migrate the necessary tables to the database, navigate to the TaskBlast
 ``dotnet ef migrations add <name>`` (if necessary)
 ``dotnet ef database update``
 
-A population script that can be used to insert dummy data into the tables can be found in the TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.DAL/Scripts/ folder.
+The TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.DAL/Scripts/ folder contains a population script for inserting dummy data into the tables.
 
 Next, to start the front end web-application, navigate to taskblaster-web/ and run \
 ``npm install``
