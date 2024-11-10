@@ -3,9 +3,9 @@ First, to create the databases and start the applications, run ``docker compose 
 If the 'notifications' container inexplicably stops running immediately after initialization, just press play again in Docker Desktop, or run ``docker compose up -d`` once more. 
 
 Next, to migrate the necessary tables to the database, navigate to the TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.API/ folder and run \
-``dotnet tool install --global dotnet-ef`` (if necessary)
-``dotnet restore`` (if necessary)
-``dotnet ef migrations add <name>`` (if necessary)
+``dotnet tool install --global dotnet-ef`` (if necessary) \
+``dotnet restore`` (if necessary) \
+``dotnet ef migrations add <name>`` (if necessary) \
 ``dotnet ef database update``
 
 The TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.DAL/Scripts/ folder contains a population script for inserting dummy data into the tables.
