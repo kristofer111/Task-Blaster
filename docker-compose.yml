@@ -42,6 +42,20 @@ services:
     networks:
       - task-blaster-network
 
+  notification-api:
+    build:
+      context: ./TaskBlaster.TaskManagement.Notifications
+      dockerfile: Dockerfile
+    container_name: notifications
+    ports:
+      - "6070:5165"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5165
+      - ConnectionStrings__HangfireDatabaseConnectionString=Host=notification-api;Port=5434;Database=Hangfire;Username=admin;Password=admin
+    networks:
+      - task-blaster-network
+
 networks:
   task-blaster-network:
     driver: bridge

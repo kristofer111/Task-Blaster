@@ -44,7 +44,7 @@ public class TaskService : ITaskService
             return null;
         }
 
-        await _notificationRepository.CreateNewTaskNotificationAsync((int) newId);
+        await _notificationRepository.CreateNewTaskNotificationAsync((int)newId);
 
         return newId;
     }
@@ -57,7 +57,7 @@ public class TaskService : ITaskService
     public async Task<bool> AssignUserToTaskAsync(int taskId, int userId)
     {
         var success = await _taskRepository.AssignUserToTaskAsync(taskId, userId);
-        
+
         if (!success)
         {
             return false;
@@ -71,13 +71,13 @@ public class TaskService : ITaskService
     public async Task<bool> UnassignUserFromTaskAsync(int taskId, int userId)
     {
         var success = await _taskRepository.UnassignUserFromTaskAsync(taskId, userId);
-    
+
         if (!success)
         {
             return false;
         }
 
-        await _notificationService.SendUnassignedNotification(userId, taskId);
+        // await _notificationService.SendUnassignedNotification(userId, taskId);
 
         return success;
     }

@@ -88,13 +88,13 @@ INSERT INTO "public"."TagTask" ("TagsId", "TasksId") VALUES
 (10, 1); -- Research for 'Setup Project Repository'
 
 INSERT INTO "public"."TaskNotifications" ("TaskId", "DueDateNotificationSent", "DayAfterNotificationSent", "LastNotificationDate") VALUES
-(1, TRUE, FALSE, NULL),   				   -- Task 1: No notifications sent
+(1, TRUE, TRUE, '2023-10-05 18:00:00'),   -- Task 1: No notifications sent
 (2, TRUE, TRUE, '2023-10-09 18:00:00'),    -- Task 2: Notifications sent on due date and day after
-(3, TRUE, FALSE, '2023-10-11 17:00:00'),   -- Task 3: No notifications sent
-(4, TRUE, FALSE, '2023-10-12 18:00:00'),   -- Task 4: Notification sent only on due date
+(3, TRUE, TRUE, '2023-10-11 17:00:00'),   -- Task 3: No notifications sent
+(4, TRUE, TRUE, '2023-10-12 18:00:00'),   -- Task 4: Notification sent only on due date
 (5, TRUE, TRUE, '2023-10-16 18:00:00'),    -- Task 5: Notifications sent on both due date and day after
-(6, TRUE, FALSE, '2023-10-16 17:00:00'),   -- Task 6: Notification sent on due date only
+(6, TRUE, TRUE, '2023-10-16 17:00:00'),   -- Task 6: Notification sent on due date only
 (7, TRUE, TRUE, '2023-10-19 18:00:00'),    -- Task 7: Notifications sent on both due date and day after
-(8, TRUE, FALSE, '2023-10-21 17:00:00'),   -- Task 8: No notifications sent
-(9, TRUE, FALSE, '2023-10-22 18:00:00'),   -- Task 9: Notification sent only on due date
+(8, TRUE, TRUE, '2023-10-21 17:00:00'),   -- Task 8: No notifications sent
+(9, TRUE, TRUE, '2023-10-22 18:00:00'),   -- Task 9: Notification sent only on due date
 (10, FALSE, FALSE, NULL);   -- Task 10: Notifications sent on both due date and day after

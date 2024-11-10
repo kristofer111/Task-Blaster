@@ -47,7 +47,10 @@ public class TaskRepository : ITaskRepository
         var user = await _taskManagementDbContext.Users
             .FirstOrDefaultAsync(u => u.Id == userId);
 
-        if (task == null || user == null || task.AssignedToId != null)
+        if (task == null ||
+            user == null ||
+            task.AssignedToId != null ||
+            task.AssignedToId == taskId)
         {
             return false;
         }
@@ -66,7 +69,9 @@ public class TaskRepository : ITaskRepository
         var user = await _taskManagementDbContext.Users
             .FirstOrDefaultAsync(u => u.Id == userId);
 
-        if (task == null || user == null)
+        if (task == null ||
+            user == null ||
+            task.AssignedToId == null)
         {
             return false;
         }
@@ -278,13 +283,14 @@ public class TaskRepository : ITaskRepository
             (t.Notification.DueDateNotificationSent == false ||
             t.Notification.DayAfterNotificationSent == false))
             .ToListAsync();
-    
+
         foreach (var task in tasks)
         {
             if (task.Notification.DueDateNotificationSent == false)
             {
                 task.Notification.DueDateNotificationSent = true;
-            } else
+            }
+            else
             {
                 task.Notification.DayAfterNotificationSent = true;
             }

@@ -77,7 +77,7 @@ public class TasksController : ControllerBase
 
         if (!success)
         {
-            return NotFound(new { message = $"Either task or user was not found. Or The task has already been assigned to a user." });
+            return NotFound(new { message = $"Either task or user was not found. Or The task has already been assigned to a user" });
         }
 
         return Ok();
@@ -90,7 +90,7 @@ public class TasksController : ControllerBase
 
         if (!success)
         {
-            return NotFound(new { message = $"Either task or user was not found" });
+            return NotFound(new { message = $"Either task or user was not found. Or task has not been assigned to anyone" });
         }
 
         return Ok();
