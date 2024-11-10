@@ -19,9 +19,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-var serviceIpOptions = new ServiceIpOptions();
-builder.Configuration.GetSection("ServiceIp").Bind(serviceIpOptions);
-builder.Services.AddSingleton(serviceIpOptions);
+var serviceUriOptions = new ServiceUriOptions();
+builder.Configuration.GetSection("ServiceUri").Bind(serviceUriOptions);
+builder.Services.AddSingleton(serviceUriOptions);
 
 
 builder.Services.AddAuthentication(options =>
@@ -32,6 +32,13 @@ builder.Services.AddAuthentication(options =>
 {
     options.Authority = builder.Configuration.GetValue<string>("Auth0:Authority");
     options.Audience = builder.Configuration.GetValue<string>("Auth0:Audience");
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true
+    };
 });
 
 

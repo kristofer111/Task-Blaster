@@ -26,8 +26,8 @@ public class UserService : IUserService
         await _userRepository.CreateUserIfNotExists(inputModel);
     }
 
-    public Task<UserDto?> GetUserByIdAsync(int userId)
+    public async Task<UserDto?> GetUserByIdAsync(int userId)
     {
-        throw new NotImplementedException();
+        return await _userRepository.GetUserByIdAsync(userId);
     }
 }

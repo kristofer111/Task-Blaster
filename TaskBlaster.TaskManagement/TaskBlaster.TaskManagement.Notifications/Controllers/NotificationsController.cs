@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskBlaster.TaskManagement.Notifications.Models;
 using TaskBlaster.TaskManagement.Notifications.Services.Interfaces;
 
 namespace TaskBlaster.TaskManagement.Notifications.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class NotificationsController : ControllerBase

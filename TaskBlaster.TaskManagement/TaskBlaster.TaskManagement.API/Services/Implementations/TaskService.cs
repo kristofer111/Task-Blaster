@@ -63,7 +63,7 @@ public class TaskService : ITaskService
             return false;
         }
 
-        // await _notificationService.SendAssignedNotification(userId, taskId);
+        await _notificationService.SendAssignedNotification(userId, taskId);
 
         return success;
     }
@@ -77,7 +77,7 @@ public class TaskService : ITaskService
             return false;
         }
 
-        // await _notificationService.SendUnassignedNotification(userId, taskId);
+        await _notificationService.SendUnassignedNotification(userId, taskId);
 
         return success;
     }
@@ -92,9 +92,9 @@ public class TaskService : ITaskService
         return await _taskRepository.UpdateTaskPriorityAsync(taskId, inputModel);
     }
 
-    public Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
+    public async Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
     {
-        return _taskRepository.GetTasksForNotifications();
+        return await _taskRepository.GetTasksForNotifications();
     }
 
     public async Task UpdateTaskNotifications()

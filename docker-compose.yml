@@ -14,6 +14,21 @@ services:
     networks:
       - task-blaster-network
 
+  task-management-api:
+    build:
+      context: ./TaskBlaster.TaskManagement
+      dockerfile: Dockerfile
+    container_name: task-management
+    ports:
+      - "6060:5212"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5212
+      - ConnectionStrings__TaskBlasterDatabaseConnectionString=Host=task-blaster-db;Port=5432;Database=TaskBlaster;Username=admin;Password=admin
+      - ServiceUri__Notifications=http://notification-api:5165/api
+    networks:
+      - task-blaster-network
+
   hangfire-db:
     image: postgres:latest
     container_name: hangfire-db
@@ -28,23 +43,9 @@ services:
     networks:
       - task-blaster-network
 
-  task-management-api:
-    build:
-      context: ./TaskBlaster.TaskManagement
-      dockerfile: Dockerfile
-    container_name: task-management
-    ports:
-      - "6060:5212"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:5212
-      - ConnectionStrings__TaskBlasterDatabaseConnectionString=Host=task-blaster-db;Port=5432;Database=TaskBlaster;Username=admin;Password=admin
-    networks:
-      - task-blaster-network
-
   notification-api:
     build:
-      context: ./TaskBlaster.TaskManagement.Notifications
+      context: ./TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.Notifications
       dockerfile: Dockerfile
     container_name: notifications
     ports:
@@ -52,7 +53,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5165
-      - ConnectionStrings__HangfireDatabaseConnectionString=Host=notification-api;Port=5434;Database=Hangfire;Username=admin;Password=admin
+      - ConnectionStrings__HangfireDatabaseConnectionString=Host=hangfire-db;Port=5432;Database=Hangfire;Username=admin;Password=admin
+      - ServiceUri__TaskManagement=http://task-management-api:5212
     networks:
       - task-blaster-network
 

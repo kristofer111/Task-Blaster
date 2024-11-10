@@ -115,11 +115,6 @@ public class TaskRepository : ITaskRepository
         return newTask.Id;
     }
 
-    // Gets a paginated and filtered list of tasks. The tasks should be
-    // filtered using the provided filtering object
-    // pageSize
-    // pageNumber
-    // searchValue
     public async Task<Envelope<TaskDto>> GetPaginatedTasksByCriteriaAsync(TaskCriteriaQueryParams query)
     {
         var tasks = query.SearchValue != null ?
@@ -221,27 +216,22 @@ public class TaskRepository : ITaskRepository
         return true;
     }
 
-    // Get all tasks which have not been notified and are due. This is
-    // used by the background processing service to retrieve a list of
-    // tasks which should be notified because the tasks are due for
-    // completion
-
-    // TODO:
-    // dont return notifications that have last notific. sent less than 24 hours ago
     public async Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
     {
-        var task = await _taskManagementDbContext.Tasks
+        var tasks = await _taskManagementDbContext.Tasks
             .Include(t => t.Notification)
             .Include(t => t.Status)
             .Include(t => t.AssignedTo)
             .Where(t => t.DueDate < DateTime.UtcNow &&
-                (t.Notification.DueDateNotificationSent == false && //TODO: change to ||
+                (t.Notification.DueDateNotificationSent == false ||
                 t.Notification.DayAfterNotificationSent == false) &&
                 t.AssignedToId != null &&
-                t.IsArchived == false)
+                t.IsArchived == false &&
+                (t.Notification.LastNotificationDate == null ||
+                t.Notification.LastNotificationDate.Value.Date < DateTime.UtcNow.Date.AddDays(-1)))
             .ToListAsync();
 
-        return task.Select(t => new TaskWithNotificationDto
+        return tasks.Select(t => new TaskWithNotificationDto
         {
             Id = t.Id,
             Title = t.Title,
@@ -266,15 +256,6 @@ public class TaskRepository : ITaskRepository
         });
     }
 
-    // Updates the status of the task notifications, after the emails have
-    // been sent. To ensure the emails will not be sent during the next
-    // process, each process is executed every 30 minutes, the
-    // notifications should be marked as completed
-
-    // _dbcontext request sem sækir bara öll tasks sem eru 
-    // með due date í dag og í gær. (Og duedatenotification /dayafternotification = false)
-
-    // Date þarf að vera universal time
     public async Task UpdateTaskNotifications()
     {
         var tasks = await _taskManagementDbContext.Tasks

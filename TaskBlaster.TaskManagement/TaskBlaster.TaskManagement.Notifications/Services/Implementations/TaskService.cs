@@ -1,5 +1,4 @@
 using System.Net.Http.Headers;
-using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Notifications.Models;
 using TaskBlaster.TaskManagement.Notifications.Services.Interfaces;
 
@@ -10,15 +9,16 @@ public class TaskService : ITaskService
     private readonly HttpClient _httpClient;
     private readonly IM2MAuthenticationService _m2MAuthenticationService;
     private readonly IConfiguration _configuration;
+    private readonly ServiceUriOptions _serviceUriOptions;
 
-    public TaskService(HttpClient httpClient, IM2MAuthenticationService m2MAuthenticationService, IConfiguration configuration, ServiceIpOptions serviceIpOptions)
+    public TaskService(HttpClient httpClient, IM2MAuthenticationService m2MAuthenticationService, IConfiguration configuration, ServiceUriOptions serviceUriOptions)
     {
         _httpClient = httpClient;
         _m2MAuthenticationService = m2MAuthenticationService;
         _configuration = configuration;
+        _serviceUriOptions = serviceUriOptions;
 
-        _httpClient.BaseAddress = new Uri($"{serviceIpOptions.TaskManagement}/tasks/notifications/tasks");
-        Console.WriteLine($"base address: {_httpClient.BaseAddress}");
+        _httpClient.BaseAddress = new Uri($"{serviceUriOptions.TaskManagement}/tasks/notifications/tasks");
     }
 
     public async Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
@@ -28,9 +28,7 @@ public class TaskService : ITaskService
 
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, "");
-        var response = await _httpClient.SendAsync(request);
-
+        var response = await _httpClient.GetAsync($"{_serviceUriOptions.TaskManagement}/tasks/notifications/tasks");
         response.EnsureSuccessStatusCode();
 
         var responseContent = await response.Content.ReadAsStringAsync();

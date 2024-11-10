@@ -9,6 +9,7 @@ ENV ECOMMERCE_DATABASE="Host=task-blaster-db;Port=5432;Database=TaskBlaster;User
 # Restore dependencies
 
 ENV ConnectionStrings__TaskBlasterDatabaseConnectionString=Host=task-blaster-db;Port=5432;Database=TaskBlaster;Username=admin;Password=admin
+ENV ServiceUri__Notifications=http://notification-api:5165/api
 RUN dotnet restore 
 RUN dotnet build 
 RUN dotnet tool install --global dotnet-ef
