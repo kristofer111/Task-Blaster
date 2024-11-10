@@ -14,7 +14,8 @@ Next, to start the front end web-application, navigate to taskblaster-web/ and r
 ``npm install`` \
 ``npm run dev``
 
-The databases are set up with volumes to allow for persistent data. If for some reason the task-blaster-db is skipping initialization and you are not able to connect to it, it might be useful to delete the volumes and run the docker containers again. To delete the volumes, run ``docker volume rm task-blaster_task-blaster-data task-blaster_hangfire-data``
+The databases are set up with volumes to allow for persistent data. If for some reason the task-blaster-db is skipping initialization and you are not able to connect to it, it might be useful to delete the volumes and run the docker containers again. To delete the volumes, run \
+``docker volume rm task-blaster_task-blaster-data task-blaster_hangfire-data``
 
 To run the applications locally, navigate to TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.API/ and run \
 ``dotnet run``
