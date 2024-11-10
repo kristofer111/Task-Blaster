@@ -8,9 +8,8 @@ using TaskBlaster.TaskManagement.API.Services.Interfaces;
 using TaskBlaster.TaskManagement.DAL.Contexts;
 using TaskBlaster.TaskManagement.DAL.Implementations;
 using TaskBlaster.TaskManagement.DAL.Interfaces;
+using TaskBlaster.TaskManagement.Models;
 using TaskBlaster.TaskManagement.Models.InputModels;
-
-const string Audience = "https://task-management-web-api.com";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,14 +18,18 @@ builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<ITaskRepository, TaskRepository>();
 builder.Services.AddTransient<IStatusRepository, StatusRepository>();
 builder.Services.AddTransient<ITagRepository, TagRepository>();
+builder.Services.AddTransient<ICommentRepository, CommentRepository>();
+builder.Services.AddTransient<INotificationRepository, NotificationRepository>();
 
 builder.Services.AddTransient<IPriorityService, PriorityService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ITaskService, TaskService>();
 builder.Services.AddTransient<IStatusService, StatusService>();
 builder.Services.AddTransient<ITagService, TagService>();
+builder.Services.AddTransient<ICommentService, CommentService>();
+builder.Services.AddTransient<IClaimsService, ClaimsService>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
 
-builder.Services.AddTransient<IClaimsUtility, ClamsUtility>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IM2MAuthenticationService, M2MAuthenticationService>();
 
@@ -39,6 +42,10 @@ builder.Services.AddDbContext<TaskManagementDbContext>(options =>
 );
 
 builder.Services.AddMvc();
+
+var serviceUriOptions = new ServiceUriOptions();
+builder.Configuration.GetSection("ServiceUri").Bind(serviceUriOptions);
+builder.Services.AddSingleton(serviceUriOptions);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -58,8 +65,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     return;
                 }
 
-                var emailClaim = user.FindFirst(ClaimTypes.Email)?.Value ?? user.FindFirst($"{Audience}email")?.Value;
-                var nameClaim = user.FindFirst(ClaimTypes.Name)?.Value ?? user.FindFirst($"{Audience}name")?.Value;
+                var audience = builder.Configuration.GetValue<string>("Auth0:Audience");
+
+                var emailClaim = user.FindFirst(ClaimTypes.Email)?.Value ?? user.FindFirst($"{audience}email")?.Value;
+                var nameClaim = user.FindFirst(ClaimTypes.Name)?.Value ?? user.FindFirst($"{audience}name")?.Value;
 
                 var pictureClaim = user.FindFirst("picture")?.Value;
                 var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();

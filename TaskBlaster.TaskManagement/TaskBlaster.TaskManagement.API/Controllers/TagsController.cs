@@ -18,10 +18,6 @@ public class TagsController : ControllerBase
         _tagService = tagService;
     }
 
-    /// <summary>
-    /// Gets all tags
-    /// </summary>
-    /// <returns>A list of all tags</returns>
     [HttpGet("")]
     public async Task<ActionResult<IEnumerable<TagDto>>> GetAllTags()
     {
@@ -29,10 +25,6 @@ public class TagsController : ControllerBase
         return Ok(tags);
     }
 
-    /// <summary>
-    /// Create a new tag
-    /// </summary>
-    /// <param name="inputModel">An input model used to populate the new tag</param>
     [HttpPost("")]
     public async Task<ActionResult> CreateNewTag([FromBody] TagInputModel inputModel)
     {
@@ -43,6 +35,6 @@ public class TagsController : ControllerBase
             return Conflict(new { message = "Name has already been taken" });
         }
 
-        return Created();
+        return StatusCode(201);
     }
 }

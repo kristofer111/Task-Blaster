@@ -42,10 +42,16 @@ public class TaskService : ITaskService
         return tasks;
     }
 
-    // _dbcontext request sem sækir bara öll tasks sem eru með due date í dag og í gær. 
-    // (Og duedatenotification /dayafternotification = false)
-    public Task UpdateTaskNotifications()
-    {
-        throw new NotImplementedException();
+    public async Task UpdateTaskNotifications()
+    {   
+        var audience = _configuration.GetValue<string>("Auth0:Audience") ?? throw new ArgumentNullException("Auth0:Audience");
+        var token = await _m2MAuthenticationService.RetrieveAccessToken(audience);
+        
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        
+        var request = new HttpRequestMessage(HttpMethod.Patch, "");
+        var response = await _httpClient.SendAsync(request);
+        
+        response.EnsureSuccessStatusCode();
     }
 }

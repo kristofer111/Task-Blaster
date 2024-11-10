@@ -15,10 +15,6 @@ public class StatusController : ControllerBase
         _statusService = statusService;
     }
 
-    /// <summary>
-    /// Returns a list of all statuses
-    /// </summary>
-    /// <returns>A list of all statuses</returns>
     [HttpGet("")]
     public async Task<ActionResult<IEnumerable<StatusDto>>> GetAllStatuses()
     {

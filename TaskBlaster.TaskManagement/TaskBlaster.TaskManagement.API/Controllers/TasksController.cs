@@ -13,18 +13,17 @@ namespace TaskBlaster.TaskManagement.API.Controllers;
 public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
+    private readonly ICommentService _commentService;
+    private readonly string _audience;
 
-    public TasksController(ITaskService taskService)
+    public TasksController(ITaskService taskService, ICommentService commentService, IConfiguration configuration)
     {
         _taskService = taskService;
+        _commentService = commentService;
+        _audience = configuration.GetValue<string>("Auth0:Audience") ?? throw new ArgumentNullException("Auth0:Audience");
     }
 
 
-    /// <summary>
-    /// Returns all tasks by a provided criteria as a paginated result
-    /// </summary>
-    /// <param name="query">A query which is used to paginate and filter the result</param>
-    /// <returns>A filtered and paginated list of tasks</returns>
     [HttpGet("")]
     public async Task<ActionResult<Envelope<TaskDto>>> GetPaginatedTasksByCriteria([FromQuery] TaskCriteriaQueryParams query)
     {
@@ -32,11 +31,6 @@ public class TasksController : ControllerBase
         return Ok(tasks);
     }
 
-    /// <summary>
-    /// Returns a single task by id
-    /// </summary>
-    /// <param name="taskId">The id of the task</param>
-    /// <returns>A single task or null</returns>
     [HttpGet("{taskId}", Name = "GetTaskById")]
     public async Task<ActionResult<TaskDetailsDto?>> GetTaskById(int taskId)
     {
@@ -50,10 +44,6 @@ public class TasksController : ControllerBase
         return Ok(task);
     }
 
-    /// <summary>
-    /// Creates a new task
-    /// </summary>
-    /// <param name="task">Input model used to populate the new task</param>
     [HttpPost("")]
     public async Task<ActionResult> CreateNewTask([FromBody] TaskInputModel task)
     {
@@ -61,16 +51,12 @@ public class TasksController : ControllerBase
 
         if (newId == null)
         {
-            return BadRequest(new { message = "Task could not be created because the token is missing required claims" });
+            return BadRequest(new { message = "Task could not be created because the token is missing or does not have required claims" });
         }
 
         return CreatedAtRoute("GetTaskById", new { taskId = newId }, null);
     }
 
-    /// <summary>
-    /// Archives a task by id
-    /// </summary>
-    /// <param name="taskId">The id of the task which should be archived</param>
     [HttpDelete("{taskId}")]
     public async Task<ActionResult> ArchiveTaskById(int taskId)
     {
@@ -84,11 +70,6 @@ public class TasksController : ControllerBase
         return Ok();
     }
 
-    /// <summary>
-    /// Assigns a user from a task by id
-    /// </summary>
-    /// <param name="taskId">The id of the task</param>
-    /// <param name="userId">The id of the user which should be assigned</param>
     [HttpPatch("{taskId}/assign/{userId}")]
     public async Task<ActionResult> AssignUserToTask(int taskId, int userId)
     {
@@ -96,17 +77,12 @@ public class TasksController : ControllerBase
 
         if (!success)
         {
-            return NotFound(new { message = $"Either task or user was not found" });
+            return NotFound(new { message = $"Either task or user was not found. Or The task has already been assigned to a user." });
         }
 
         return Ok();
     }
 
-    /// <summary>
-    /// Unassigns a user from a task by id
-    /// </summary>
-    /// <param name="taskId">The id of the task</param>
-    /// <param name="userId">The id of the user which should be unassigned</param>
     [HttpPatch("{taskId}/unassign/{userId}")]
     public async Task<ActionResult> UnassignUserFromTask(int taskId, int userId)
     {
@@ -120,11 +96,6 @@ public class TasksController : ControllerBase
         return Ok();
     }
 
-    /// <summary>
-    /// Updates the status of a task, e.g. 'pending', 'completed'
-    /// </summary>
-    /// <param name="taskId">The id of the task</param>
-    /// <param name="inputModel">The input model associated with the status update</param>
     [HttpPatch("{taskId}/status")]
     public async Task<ActionResult> UpdateTaskStatus(int taskId, [FromBody] StatusInputModel inputModel)
     {
@@ -138,11 +109,6 @@ public class TasksController : ControllerBase
         return Ok();
     }
 
-    /// <summary>
-    /// Updates the priority of a task, e.g. 'Critical', 'High'
-    /// </summary>
-    /// <param name="taskId">The id of the task</param>
-    /// <param name="inputModel">The input model associated with the priority update</param>
     [HttpPatch("{taskId}/priority")]
     public async Task<ActionResult> UpdateTaskPriority(int taskId, [FromBody] PriorityInputModel inputModel)
     {
@@ -156,29 +122,18 @@ public class TasksController : ControllerBase
         return Ok();
     }
 
-    /// <summary>
-    /// Gets all comments associated with a task
-    /// </summary>
-    /// <param name="taskId">The id of the task</param>
-    /// <returns>A list of comments</returns>
     [HttpGet("{taskId}/comments")]
     public async Task<ActionResult> GetCommentsAssociatedWithTask(int taskId)
     {
-        var comments = await _taskService.GetCommentsAssociatedWithTaskAsync(taskId);
+        var comments = await _commentService.GetCommentsAssociatedWithTaskAsync(taskId);
         return Ok(comments);
     }
 
-    /// <summary>
-    /// Adds a single comment to a task
-    /// </summary>
-    /// <param name="taskId">The id of the task</param>
-    /// <param name="inputModel">The input model for the comment</param>
-    /// 
-    // TODO add author to task
+    // TODO add author to comment
     [HttpPost("{taskId}/comments")]
     public async Task<ActionResult> AddCommentToTask(int taskId, [FromBody] CommentInputModel inputModel)
     {
-        var success = await _taskService.AddCommentToTaskAsync(taskId, inputModel);
+        var success = await _commentService.AddCommentToTaskAsync(taskId, inputModel);
 
         if (!success)
         {
@@ -188,15 +143,10 @@ public class TasksController : ControllerBase
         return Ok();
     }
 
-    /// <summary>
-    /// Removes a comment from a task
-    /// </summary>
-    /// <param name="taskId">The id of the task</param>
-    /// <param name="commentId">The id of the comment</param>
     [HttpDelete("{taskId}/comments/{commentId}")]
     public async Task<ActionResult> RemoveCommentFromTask(int taskId, int commentId)
     {
-        var success = await _taskService.RemoveCommentFromTaskAsync(taskId, commentId);
+        var success = await _commentService.RemoveCommentFromTaskAsync(taskId, commentId);
 
         if (!success)
         {
@@ -206,11 +156,17 @@ public class TasksController : ControllerBase
         return Ok();
     }
 
-    // GetTasksForNotifications
     [HttpGet("notifications/tasks")]
     public async Task<ActionResult<IEnumerable<TaskWithNotificationDto>>> GetTasksForNotifications()
     {
         var tasks = await _taskService.GetTasksForNotifications();
         return Ok(tasks);
+    }
+
+    [HttpPatch("notifications/tasks")]
+    public async Task<ActionResult> UpdateTaskNotifications()
+    {
+        await _taskService.UpdateTaskNotifications();
+        return Ok();
     }
 }

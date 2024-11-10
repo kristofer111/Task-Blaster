@@ -13,7 +13,6 @@ public class Comment
     public string ContentAsMarkdown { get; set; } = null!;
     [Required]
     public DateTime CreatedDate { get; set; }
-    [ForeignKey("Task")]
-    public int TaskId { get; set; }
+    [ForeignKey("Task")] public int TaskId { get; set; }
     public Task Task { get; set; } = null!;
 }

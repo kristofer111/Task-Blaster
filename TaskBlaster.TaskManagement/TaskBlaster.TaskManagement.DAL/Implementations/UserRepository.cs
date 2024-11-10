@@ -22,7 +22,8 @@ public class UserRepository : IUserRepository
     // within the database to keep track of users within the system
     public async Task CreateUserIfNotExists(UserInputModel inputModel)
     {
-        bool userHasEmail = await _taskManagementDbContext.Users.AnyAsync(u => u.EmailAddress == inputModel.Email);
+        bool userHasEmail = await _taskManagementDbContext.Users
+            .AnyAsync(u => u.EmailAddress == inputModel.Email);
 
         if (!userHasEmail)
         {

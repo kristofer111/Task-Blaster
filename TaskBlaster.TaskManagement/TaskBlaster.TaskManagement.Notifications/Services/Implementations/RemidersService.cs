@@ -15,6 +15,12 @@ namespace TaskBlaster.TaskManagement.Notifications.Services.Implementations
             _mailService = mailService;
         }
 
+        public async Task ProcessTaskNotifications()
+        {
+            await SendDueDateReminders();
+            await UpdateTaskNotifications();
+        }
+
         public async Task SendDueDateReminders()
         {
             IEnumerable<TaskWithNotificationDto> tasks = await _taskService.GetTasksForNotifications();
@@ -37,9 +43,14 @@ namespace TaskBlaster.TaskManagement.Notifications.Services.Implementations
 
                 if (!success)
                 {
-                    Console.WriteLine("Error sending reminder.");
+                    Console.WriteLine($"Error sending reminder for task with id {task.Id}.");
                 }
             }
+        }
+
+        public async Task UpdateTaskNotifications()
+        {
+            await _taskService.UpdateTaskNotifications();
         }
     }
 }

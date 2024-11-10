@@ -15,10 +15,6 @@ public class NotificationsController : ControllerBase
         _mailService = mailService;
     }
 
-    /// <summary>
-    /// Sends a basic email
-    /// </summary>
-    /// <param name="inputModel">An input model used to populate the basic email</param>
     [HttpPost("emails/basic")]
     public async Task<ActionResult> SendBasicEmail([FromBody] BasicEmailInputModel inputModel)
     {
@@ -34,10 +30,6 @@ public class NotificationsController : ControllerBase
         return Ok();
     }
 
-    /// <summary>
-    /// Sends a templated email (optional)
-    /// </summary>
-    /// <param name="inputModel">An input model used to populate the templated email</param>
     [HttpPost("emails/template")]
     public Task<ActionResult> SendTemplatedEmail([FromBody] TemplateEmailInputModel inputModel)
     {

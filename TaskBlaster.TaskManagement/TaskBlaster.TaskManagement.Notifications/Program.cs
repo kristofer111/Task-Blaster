@@ -46,6 +46,7 @@ builder.Services.AddHangfire(configuration => configuration
 
 
 builder.Services.AddHangfireServer();
+
 builder.Services.AddHttpClient();
 
 var app = builder.Build();

@@ -97,4 +97,4 @@ INSERT INTO "public"."TaskNotifications" ("TaskId", "DueDateNotificationSent", "
 (7, TRUE, TRUE, '2023-10-19 18:00:00'),    -- Task 7: Notifications sent on both due date and day after
 (8, TRUE, FALSE, '2023-10-21 17:00:00'),   -- Task 8: No notifications sent
 (9, TRUE, FALSE, '2023-10-22 18:00:00'),   -- Task 9: Notification sent only on due date
-(10, FALSE, FALSE, '2023-10-26 17:00:00');   -- Task 10: Notifications sent on both due date and day after
+(10, FALSE, FALSE, NULL);   -- Task 10: Notifications sent on both due date and day after

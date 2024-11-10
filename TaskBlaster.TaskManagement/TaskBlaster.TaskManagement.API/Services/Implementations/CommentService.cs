@@ -1,4 +1,5 @@
 using TaskBlaster.TaskManagement.API.Services.Interfaces;
+using TaskBlaster.TaskManagement.DAL.Interfaces;
 using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Models.InputModels;
 
@@ -6,18 +7,29 @@ namespace TaskBlaster.TaskManagement.API.Services.Implementations;
 
 public class CommentService : ICommentService
 {
-    public Task<IEnumerable<CommentDto>> GetCommentsAssociatedWithTaskAsync(int taskId)
+    private readonly ICommentRepository _commentRepository;
+    private readonly IClaimsService _claimsService;
+
+    public CommentService(ICommentRepository commentRepository, IClaimsService claimsService)
     {
-        throw new NotImplementedException();
+        _commentRepository = commentRepository;
+        _claimsService = claimsService;
     }
 
-    public Task AddCommentToTaskAsync(int taskId, string user, CommentInputModel comment)
+
+    public async Task<IEnumerable<CommentDto>> GetCommentsAssociatedWithTaskAsync(int taskId)
     {
-        throw new NotImplementedException();
+        return await _commentRepository.GetCommentsAssociatedWithTaskAsync(taskId);
     }
 
-    public Task RemoveCommentFromTaskAsync(int taskId, int commentId)
+    public async Task<bool> AddCommentToTaskAsync(int taskId, CommentInputModel comment)
     {
-        throw new NotImplementedException();
+        string username = _claimsService.RetrieveUserNameClaim();
+        return await _commentRepository.AddCommentToTaskAsync(taskId, username, comment);
+    }
+
+    public async Task<bool> RemoveCommentFromTaskAsync(int taskId, int commentId)
+    {
+        return await _commentRepository.RemoveCommentFromTaskAsync(taskId, commentId);
     }
 }

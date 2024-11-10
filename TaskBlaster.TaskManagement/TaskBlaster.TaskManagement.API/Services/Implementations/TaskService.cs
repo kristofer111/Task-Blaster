@@ -9,10 +9,17 @@ namespace TaskBlaster.TaskManagement.API.Services.Implementations;
 public class TaskService : ITaskService
 {
     private readonly ITaskRepository _taskRepository;
+    private readonly IClaimsService _claimsService;
+    private readonly INotificationRepository _notificationRepository;
+    private readonly INotificationService _notificationService;
 
-    public TaskService(ITaskRepository taskRepository)
+
+    public TaskService(ITaskRepository taskRepository, IClaimsService claimsService, INotificationRepository notificationRepository, INotificationService notificationService)
     {
         _taskRepository = taskRepository;
+        _claimsService = claimsService;
+        _notificationRepository = notificationRepository;
+        _notificationService = notificationService;
     }
 
 
@@ -29,7 +36,17 @@ public class TaskService : ITaskService
 
     public async Task<int?> CreateNewTaskAsync(TaskInputModel task)
     {
-        return await _taskRepository.CreateNewTaskAsync(task);
+        string emailClaim = _claimsService.RetrieveUserEmailClaim();
+        var newId = await _taskRepository.CreateNewTaskAsync(task, emailClaim);
+
+        if (newId == null)
+        {
+            return null;
+        }
+
+        await _notificationRepository.CreateNewTaskNotificationAsync((int) newId);
+
+        return newId;
     }
 
     public async Task<bool> ArchiveTaskByIdAsync(int taskId)
@@ -39,12 +56,30 @@ public class TaskService : ITaskService
 
     public async Task<bool> AssignUserToTaskAsync(int taskId, int userId)
     {
-        return await _taskRepository.AssignUserToTaskAsync(taskId, userId);
+        var success = await _taskRepository.AssignUserToTaskAsync(taskId, userId);
+        
+        if (!success)
+        {
+            return false;
+        }
+
+        // await _notificationService.SendAssignedNotification(userId, taskId);
+
+        return success;
     }
 
     public async Task<bool> UnassignUserFromTaskAsync(int taskId, int userId)
     {
-        return await _taskRepository.UnassignUserFromTaskAsync(taskId, userId);
+        var success = await _taskRepository.UnassignUserFromTaskAsync(taskId, userId);
+    
+        if (!success)
+        {
+            return false;
+        }
+
+        await _notificationService.SendUnassignedNotification(userId, taskId);
+
+        return success;
     }
 
     public async Task<bool> UpdateTaskStatusAsync(int taskId, StatusInputModel inputModel)
@@ -57,24 +92,13 @@ public class TaskService : ITaskService
         return await _taskRepository.UpdateTaskPriorityAsync(taskId, inputModel);
     }
 
-    public async Task<IEnumerable<CommentDto>> GetCommentsAssociatedWithTaskAsync(int taskId)
+    public Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
     {
-        return await _taskRepository.GetCommentsAssociatedWithTaskAsync(taskId);
+        return _taskRepository.GetTasksForNotifications();
     }
 
-    public async Task<bool> AddCommentToTaskAsync(int taskId, CommentInputModel inputModel)
+    public async Task UpdateTaskNotifications()
     {
-        return await _taskRepository.AddCommentToTaskAsync(taskId, inputModel);
-    }
-
-    public async Task<bool> RemoveCommentFromTaskAsync(int taskId, int commentId)
-    {
-        return await _taskRepository.RemoveCommentFromTaskAsync(taskId, commentId);
-    }
-
-    // GetTasksForNotifications
-    public async Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
-    {
-        return await _taskRepository.GetTasksForNotifications();
+        await _taskRepository.UpdateTaskNotifications();
     }
 }

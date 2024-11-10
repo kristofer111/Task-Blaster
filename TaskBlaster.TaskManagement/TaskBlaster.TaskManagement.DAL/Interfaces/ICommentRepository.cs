@@ -7,7 +7,7 @@ public interface ICommentRepository
 {
     Task<IEnumerable<CommentDto>> GetCommentsAssociatedWithTaskAsync(int taskId);
 
-    Task AddCommentToTaskAsync(int taskId, string user, CommentInputModel comment);
+    Task<bool> AddCommentToTaskAsync(int taskId, string username, CommentInputModel comment);
 
-    Task RemoveCommentFromTaskAsync(int taskId, int commentId);
+    Task<bool> RemoveCommentFromTaskAsync(int taskId, int commentId);
 }

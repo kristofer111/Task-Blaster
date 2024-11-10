@@ -10,7 +10,7 @@ public interface ITaskRepository
 
     Task<TaskDetailsDto?> GetTaskByIdAsync(int taskId);
 
-    Task<int?> CreateNewTaskAsync(TaskInputModel task);
+    Task<int?> CreateNewTaskAsync(TaskInputModel task, string emailClaim);
 
     Task<bool> ArchiveTaskByIdAsync(int taskId);
 
@@ -25,10 +25,4 @@ public interface ITaskRepository
     Task<bool> UpdateTaskPriorityAsync(int taskId, PriorityInputModel inputModel);
     
     Task UpdateTaskNotifications();
-
-    Task<IEnumerable<CommentDto>> GetCommentsAssociatedWithTaskAsync(int taskId);
-
-    Task<bool> AddCommentToTaskAsync(int taskId, CommentInputModel inputModel);
-
-    Task<bool> RemoveCommentFromTaskAsync(int taskId, int commentId);
 }
