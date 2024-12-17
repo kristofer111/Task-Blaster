@@ -224,7 +224,7 @@ public class TaskRepository : ITaskRepository
     // Get all tasks which have not been notified and are due. This is
     // used by the background processing service to retrieve a list of
     // tasks which should be notified because the tasks are due for
-    // completion
+    // completion   
 
     // TODO:
     // dont return notifications that have last notific. sent less than 24 hours ago

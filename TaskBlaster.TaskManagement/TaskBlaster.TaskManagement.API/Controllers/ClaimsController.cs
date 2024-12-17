@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Gateway.Controllers
+namespace TaskBlaster.TaskManagement.API.Controllers
 {
     [Authorize]
     [ApiController]
