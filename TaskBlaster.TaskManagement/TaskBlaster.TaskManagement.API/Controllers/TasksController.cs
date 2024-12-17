@@ -7,20 +7,18 @@ using TaskBlaster.TaskManagement.Models.InputModels;
 
 namespace TaskBlaster.TaskManagement.API.Controllers;
 
-// [Authorize]
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
     private readonly ICommentService _commentService;
-    private readonly string _audience;
 
-    public TasksController(ITaskService taskService, ICommentService commentService, IConfiguration configuration)
+    public TasksController(ITaskService taskService, ICommentService commentService)
     {
         _taskService = taskService;
         _commentService = commentService;
-        _audience = configuration.GetValue<string>("Auth0:Audience") ?? throw new ArgumentNullException("Auth0:Audience");
     }
 
 
@@ -129,7 +127,6 @@ public class TasksController : ControllerBase
         return Ok(comments);
     }
 
-    // TODO add author to comment
     [HttpPost("{taskId}/comments")]
     public async Task<ActionResult> AddCommentToTask(int taskId, [FromBody] CommentInputModel inputModel)
     {
@@ -157,6 +154,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet("notifications/tasks")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<ActionResult<IEnumerable<TaskWithNotificationDto>>> GetTasksForNotifications()
     {
         var tasks = await _taskService.GetTasksForNotifications();
@@ -164,6 +162,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPatch("notifications/tasks")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<ActionResult> UpdateTaskNotifications()
     {
         await _taskService.UpdateTaskNotifications();

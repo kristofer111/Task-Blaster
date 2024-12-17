@@ -1,4 +1,3 @@
-using TaskBlaster.TaskManagement.Models.Dtos;
 using TaskBlaster.TaskManagement.Notifications.Models;
 using TaskBlaster.TaskManagement.Notifications.Services.Interfaces;
 
@@ -17,11 +16,11 @@ namespace TaskBlaster.TaskManagement.Notifications.Services.Implementations
 
         public async Task ProcessTaskNotifications()
         {
-            await SendDueDateReminders();
-            await UpdateTaskNotifications();
+            var tasks = await SendDueDateReminders();
+            if (tasks.Any()) await UpdateTaskNotifications();
         }
 
-        public async Task SendDueDateReminders()
+        public async Task<IEnumerable<TaskWithNotificationDto>> SendDueDateReminders()
         {
             IEnumerable<TaskWithNotificationDto> tasks = await _taskService.GetTasksForNotifications();
 
@@ -46,6 +45,8 @@ namespace TaskBlaster.TaskManagement.Notifications.Services.Implementations
                     Console.WriteLine($"Error sending reminder for task with id {task.Id}.");
                 }
             }
+
+            return tasks;
         }
 
         public async Task UpdateTaskNotifications()

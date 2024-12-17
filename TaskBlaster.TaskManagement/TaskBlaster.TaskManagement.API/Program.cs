@@ -52,6 +52,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.Authority = builder.Configuration.GetValue<string>("Auth0:Authority");
         options.Audience = builder.Configuration.GetValue<string>("Auth0:Audience");
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
+        };
 
         options.Events = new JwtBearerEvents
         {
@@ -93,7 +100,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Error creating/updating user with Email: {EmailClaim}, Name: {NameClaim} from token",
+                    logger.LogError(ex, "Failed to create or update user with email: {EmailClaim} and name: {NameClaim} from token",
                         emailClaim, nameClaim);
                 }
             }

@@ -9,7 +9,7 @@ namespace TaskBlaster.TaskManagement.Notifications.Services.Implementations
             RecurringJob.AddOrUpdate<RemidersService>(
                 "SendDueDateReminders",
                 remindersService => remindersService.ProcessTaskNotifications(),
-                "*/30 * * * *"
+                "*/1 * * * *"
             );
         }
     }

@@ -6,7 +6,7 @@ using TaskBlaster.TaskManagement.Models.InputModels;
 
 namespace TaskBlaster.TaskManagement.API.Controllers;
 
-// [Authorize]
+[Authorize]
 [Route("[controller]")]
 [ApiController]
 public class UsersController : ControllerBase
@@ -18,10 +18,6 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
-    /// <summary>
-    /// Gets all registered users
-    /// </summary>
-    /// <returns>A list of all registered users</returns>
     [HttpGet("")]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
     {
@@ -33,12 +29,6 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<UserDto>> GetUserByIdAsync(int id)
     {
         var user = await _userService.GetUserByIdAsync(id);
-
-        if (user == null)
-        {
-            return Conflict(new { Message = "Email address already taken" });
-        }
-
         return Ok(user);
     }
 

@@ -14,7 +14,7 @@ public class MailjetService : IMailService
     private readonly string _apiKey;
     private readonly string _secretKey;
 
-    public MailjetService(HttpClient httpClient, ITaskService taskService, ServiceIpOptions serviceIpOptions, IConfiguration configuration)
+    public MailjetService(HttpClient httpClient, ITaskService taskService, ServiceUriOptions serviceIpOptions, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _taskService = taskService;
@@ -38,7 +38,7 @@ public class MailjetService : IMailService
             {
                 new
                 {
-                    From = new { Email = "kristofers21@ru.is", Name = "Task Blaster"},
+                    From = new { Email = "kristoferorri1@gmail.com", Name = "Task Blaster"},
                     To = new[]
                     {
                         new { Email = basicEmail.To }
