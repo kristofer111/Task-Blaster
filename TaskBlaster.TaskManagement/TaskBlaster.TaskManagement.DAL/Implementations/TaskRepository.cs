@@ -216,6 +216,13 @@ public class TaskRepository : ITaskRepository
         return true;
     }
 
+    // Get all tasks which have not been notified and are due. This is
+    // used by the background processing service to retrieve a list of
+    // tasks which should be notified because the tasks are due for
+    // completion   
+
+    // TODO:
+    // dont return notifications that have last notific. sent less than 24 hours ago
     public async Task<IEnumerable<TaskWithNotificationDto>> GetTasksForNotifications()
     {
         var tasks = await _taskManagementDbContext.Tasks
