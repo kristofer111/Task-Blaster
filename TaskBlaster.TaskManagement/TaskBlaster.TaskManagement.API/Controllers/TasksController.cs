@@ -7,7 +7,7 @@ using TaskBlaster.TaskManagement.Models.InputModels;
 
 namespace TaskBlaster.TaskManagement.API.Controllers;
 
-[Authorize]
+// [Authorize]
 [ApiController]
 [Route("[controller]")]
 public class TasksController : ControllerBase

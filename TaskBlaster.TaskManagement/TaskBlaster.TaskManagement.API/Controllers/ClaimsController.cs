@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Gateway.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class ClaimsController : ControllerBase
