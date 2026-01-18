@@ -17,12 +17,6 @@ public class TaskRepository : ITaskRepository
         _taskManagementDbContext = taskManagementDbContext;
     }
 
-    // add tags to tasks will not be implemented
-
-
-    // Archives a task by id. Archiving can mean a few things, and
-    // depends on your implementation but normally it means that it
-    // should not be removed entirely from the database
     public async Task<bool> ArchiveTaskByIdAsync(int taskId)
     {
         var task = await _taskManagementDbContext.Tasks
