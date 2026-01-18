@@ -15,6 +15,11 @@ obj/
 **/bin/
 **/obj/
 
+/TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.API/appsettings.json
+/TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.API/appsettings.Development.json
+/TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.Notifications/appsettings.json
+/TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.Notifications/appsettings.Development.json
+
 /TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.API/bin
 /TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.API/obj
 /TaskBlaster.TaskManagement/TaskBlaster.TaskManagement.DAL/bin
