@@ -1,6 +1,7 @@
 This project is a task management backend implemented in ASP.NET Core with RESTful APIs and PostgreSql databases. The backend represents the background processes that might occur when working with systems such as Trello, JIRA or equivalent software. The backend has internal communication between APIs which are protected using M2M token-based authentication associated with Auth0. The backend is also set up to notify users with an external notification service using Mailjet. The entire backend is containerized with Docker, including with multi-service orchestration with Docker Compose.
 
 ## Dependencies
+
 This project uses the following key technologies:
 - ASP.NET Core
 - Entity Framework Core
