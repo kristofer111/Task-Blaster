@@ -5,7 +5,7 @@ using TaskBlaster.TaskManagement.Models.Dtos;
 
 namespace TaskBlaster.TaskManagement.API.Controllers;
 
-[Authorize]
+// [Authorize]
 [Route("[controller]")]
 [ApiController]
 public class PrioritiesController : ControllerBase

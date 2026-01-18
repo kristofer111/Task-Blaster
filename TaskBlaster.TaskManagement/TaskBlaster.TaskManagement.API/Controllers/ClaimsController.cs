@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TaskBlaster.TaskManagement.API.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class ClaimsController : ControllerBase

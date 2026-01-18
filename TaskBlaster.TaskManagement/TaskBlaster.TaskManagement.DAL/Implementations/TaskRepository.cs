@@ -197,7 +197,7 @@ public class TaskRepository : ITaskRepository
             .FirstOrDefaultAsync(t => t.Id == taskId);
 
         var priority = await _taskManagementDbContext.Priorities
-            .FirstOrDefaultAsync(s => s.Id == inputModel.PriorityId);
+            .FirstOrDefaultAsync(p => p.Id == inputModel.PriorityId);
 
         if (task == null || priority == null)
         {

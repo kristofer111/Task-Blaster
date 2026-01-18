@@ -9,15 +9,13 @@ namespace TaskBlaster.TaskManagement.Notifications.Services.Implementations;
 public class MailjetService : IMailService
 {
     private readonly HttpClient _httpClient;
-    private readonly ITaskService _taskService;
 
     private readonly string _apiKey;
     private readonly string _secretKey;
 
-    public MailjetService(HttpClient httpClient, ITaskService taskService, ServiceUriOptions serviceIpOptions, IConfiguration configuration)
+    public MailjetService(HttpClient httpClient, ServiceUriOptions serviceIpOptions, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _taskService = taskService;
         _apiKey = configuration.GetValue<string>("Mailjet:ApiKey") ?? throw new ArgumentNullException("Mailjet:ApiKey");
         _secretKey = configuration.GetValue<string>("Mailjet:SecretKey") ?? throw new ArgumentNullException("Mailjet:SecretKey");
 
@@ -56,7 +54,6 @@ public class MailjetService : IMailService
         request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
 
         var response = await _httpClient.SendAsync(request);
-
         response.EnsureSuccessStatusCode();
 
         return true;

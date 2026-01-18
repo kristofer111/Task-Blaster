@@ -5,7 +5,7 @@ using TaskBlaster.TaskManagement.Notifications.Services.Interfaces;
 
 namespace TaskBlaster.TaskManagement.Notifications.Controllers;
 
-[Authorize]
+// [Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class NotificationsController : ControllerBase
